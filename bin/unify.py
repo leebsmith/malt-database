@@ -86,6 +86,8 @@ def main():
                 malt["color_lovibond"] = color
             if yield_fraction is not None:
                 malt["yield_fraction"] = yield_fraction
+            if entry.get("sold_out") is not None:
+                malt["sold_out"] = entry["sold_out"]
 
             problems = [e.message for e in canonical_validator.iter_errors(malt)]
             if problems:

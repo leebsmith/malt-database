@@ -137,10 +137,21 @@ which are excluded). Honours the 10 s crawl-delay. Each page has
 (`strong` + `span.product-data`), with `Colour °L` preferred over `Colour SRM`,
 and `Extract %`.
 
+### Crisp (sitemap, English only)
+
+`make crisp` reads `malts-sitemap.xml`, keeping the 49 non-locale
+`/malts/<slug>/` links (the sitemap also lists `/en-us/malts/` duplicates).
+Each page has `section.breadcrumb h1` (name), `.malt-post__tasting` list items
+(notes), `.malt-post__text` paragraphs (description), and a `.malt-post__table`
+with Parameter/IoB/EBC/ASBC columns. Table shape varies: colour prefers a `°L`
+cell, else the last EBC cell; extract uses the last `%` cell, else `L°/kg`
+(`/3.866`). Products whose title image marks "Sold Out" get `sold_out: true`.
+
 ## Canonical schema
 
 Required fields: `name`, `maltster`, `category`.
-Optional: `yield_fraction` (0..1), `color_lovibond`, `notes`, `description`.
+Optional: `yield_fraction` (0..1), `color_lovibond`, `notes`, `description`,
+`sold_out` (only where the source reports availability).
 
 `category` is one of `BASE`, `ROASTED`, `CRYSTAL`, `ACIDULATED`.
 
@@ -178,6 +189,8 @@ Per-maltster normalization lives in `lib/malt.py` and is dispatched by
 - **Canada Malting** — colour midpoint from `Colour °L` (fallback `Colour SRM`);
   `extract_pct` from `Extract %`. Category comes from the `h3` type via
   `category_hint` (Base/Specialty/Adjunct/Other all map to `BASE`).
+- **Crisp** — colour from a `°L` cell (else last EBC `x0.508`); extract from the
+  last `%` cell (else `L°/kg /3.866`). `sold_out` is carried into the DB.
 - `category` assigned by `lib.malt.classify_category()`.
 
 ## Crawling etiquette
@@ -221,6 +234,10 @@ present in `data/source/`; `make clean` forces a re-fetch.
   catalog and are excluded. Flaked grains and Food Grade Malt publish no
   colour/extract. CMC is a base/specialty producer, so everything maps to
   `BASE`.
+- Crisp includes 8 sold-out products (`sold_out: true`); they are kept for
+  completeness. Some special-edition/duplicate pages exist (e.g. `chit-malt`
+  vs `chitmalt`). A few products (flaked grains, rice hulls, peated/pot-still)
+  publish no colour; "No 19 Maris Otter" publishes no extract.
 - Briess dark roasted malts, flours, and rice hulls publish no
   yield/fermentability, so `yield_fraction` is omitted for those entries.
 - Category classification is keyword-based with curated overrides

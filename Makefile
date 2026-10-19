@@ -1,4 +1,4 @@
-MALSTERS := briess bairds simpsons fawcett gambrinus great-western bestmalz dingemans canada-malting
+MALSTERS := briess bairds simpsons fawcett gambrinus great-western bestmalz dingemans canada-malting crisp
 
 .PHONY: all source db clean $(MALSTERS)
 
@@ -24,6 +24,8 @@ bestmalz: data/maltsters/bestmalz.json
 dingemans: data/maltsters/dingemans.json
 
 canada-malting: data/maltsters/canada-malting.json
+
+crisp: data/maltsters/crisp.json
 
 data/source/briess/products.html: bin/fetch-briess.sh bin/fetch.sh
 	bin/fetch-briess.sh
@@ -51,6 +53,9 @@ data/source/dingemans/_sitemap.xml: bin/fetch-dingemans.sh bin/fetch-sitemap.sh 
 
 data/source/canada-malting/_sitemap.xml: bin/fetch-canada-malting.sh bin/fetch-sitemap.sh bin/fetch.sh
 	bin/fetch-canada-malting.sh
+
+data/source/crisp/_sitemap.xml: bin/fetch-crisp.sh bin/fetch-sitemap.sh bin/fetch.sh
+	bin/fetch-crisp.sh
 
 data/maltsters/briess.json: data/source/briess/products.html bin/process-briess.sh bin/validate.py bin/briess.jq
 	bin/process-briess.sh
@@ -87,6 +92,10 @@ data/maltsters/dingemans.json: data/source/dingemans/_sitemap.xml bin/process-di
 data/maltsters/canada-malting.json: data/source/canada-malting/_sitemap.xml bin/process-canada-malting.sh bin/validate.py bin/canada-malting.jq
 	bin/process-canada-malting.sh
 	python3 bin/validate.py canada-malting
+
+data/maltsters/crisp.json: data/source/crisp/_sitemap.xml bin/process-crisp.sh bin/validate.py bin/crisp.jq
+	bin/process-crisp.sh
+	python3 bin/validate.py crisp
 
 db: $(MALSTERS:%=data/maltsters/%.json) bin/unify.py lib/malt.py
 	python3 bin/unify.py

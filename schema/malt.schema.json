@@ -7,11 +7,12 @@
   "required": ["name", "maltster", "category"],
   "properties": {
     "name":           { "type": "string" },
-    "maltster":       { "type": "string", "enum": ["Briess","Simpsons","Fawcett","Weyermann","Bairds","Dingemans","Muntons","Gambrinus","Great Western","Bestmalz","Canada Malting"] },
+    "maltster":       { "type": "string", "enum": ["Briess","Simpsons","Fawcett","Weyermann","Bairds","Dingemans","Muntons","Gambrinus","Great Western","Bestmalz","Canada Malting","Crisp"] },
     "yield_fraction": { "type": "number", "minimum": 0, "maximum": 1 },
     "color_lovibond": { "type": "number", "minimum": 0 },
     "notes":          { "type": "string" },
     "description":    { "type": "string" },
+    "sold_out":       { "type": "boolean" },
     "category":       { "type": "string", "enum": ["BASE","ROASTED","CRYSTAL","ACIDULATED"] }
   }
 }

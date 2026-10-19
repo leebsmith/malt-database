@@ -69,6 +69,12 @@ CATEGORY_MAP = {
         "organic-biscuit%C2%AE-md": "ROASTED",
         "organic-mroost-1400-md": "ROASTED",
     },
+    "crisp": {
+        "amber-malt": "ROASTED",
+        "brown-malt": "ROASTED",
+        "dextrin-malt": "CRYSTAL",
+        "06-smooth-coffee": "ROASTED",
+    },
 }
 
 # Per-maltster category headings -> canonical category. Used when the catalog
@@ -281,6 +287,25 @@ def _canada_malting_yield(entry: dict) -> float | None:
     return round(extract / 100, 4) if extract is not None else None
 
 
+def _crisp_color(entry: dict) -> float | None:
+    vals = [
+        v
+        for v in (entry.get("color_min"), entry.get("color_max"))
+        if v is not None
+    ]
+    if not vals:
+        return None
+    value = sum(vals) / len(vals)
+    if (entry.get("color_unit") or "").lower() == "ebc":
+        value *= 0.508
+    return round(value, 2)
+
+
+def _crisp_yield(entry: dict) -> float | None:
+    extract = entry.get("extract_pct")
+    return round(extract / 100, 4) if extract is not None else None
+
+
 _COLOR = {
     "briess": _briess_color,
     "bairds": _bairds_color,
@@ -291,6 +316,7 @@ _COLOR = {
     "bestmalz": _bestmalz_color,
     "dingemans": _dingemans_color,
     "canada malting": _canada_malting_color,
+    "crisp": _crisp_color,
 }
 
 _YIELD = {
@@ -303,6 +329,7 @@ _YIELD = {
     "bestmalz": _bestmalz_yield,
     "dingemans": _dingemans_yield,
     "canada malting": _canada_malting_yield,
+    "crisp": _crisp_yield,
 }
 
 

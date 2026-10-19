@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "crisp.schema.json",
+  "title": "Crisp intermediate malt",
+  "description": "Raw, maltster-native fields extracted from a Crisp malt page.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "slug", "maltster"],
+  "properties": {
+    "name":        { "type": "string", "minLength": 1 },
+    "slug":        { "type": "string", "minLength": 1 },
+    "maltster":    { "type": "string", "const": "Crisp" },
+    "description": { "type": "string" },
+    "notes":       { "type": "string" },
+    "sold_out":    { "type": "boolean" },
+    "extract_pct": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+    "color_unit":  { "type": ["string", "null"], "enum": ["lovibond", "srm", "ebc", null] },
+    "color_min":   { "type": ["number", "null"], "minimum": 0 },
+    "color_max":   { "type": ["number", "null"], "minimum": 0 }
+  }
+}
