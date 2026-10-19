@@ -14,6 +14,7 @@
     "notes":          { "type": "string" },
     "description":    { "type": "string" },
     "sold_out":       { "type": "boolean" },
-    "category":       { "type": "string", "enum": ["BASE","ROASTED","CRYSTAL","ACIDULATED"] }
+    "category":       { "type": "string", "enum": ["BASE","ROASTED","CRYSTAL","ACIDULATED"] },
+    "product_type":   { "type": "string", "enum": ["malt","extract","adjunct","syrup"] }
   }
 }

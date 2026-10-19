@@ -23,6 +23,7 @@ from lib.malt import (
     color_to_lovibond,
     extract_to_yield,
     normalize_name,
+    product_type,
     yield_basis,
 )
 
@@ -80,6 +81,7 @@ def main():
                 "category": classify_category(
                     maltster, name, slug, entry.get("category_hint")
                 ),
+                "product_type": product_type(name, slug),
             }
             if entry.get("description"):
                 malt["description"] = html.unescape(entry["description"])

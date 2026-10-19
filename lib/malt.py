@@ -11,6 +11,7 @@ fermentability%; Bairds: an SRM range + extract%).
 """
 
 from pathlib import Path
+import re
 
 ROOT = Path(__file__).resolve().parent.parent
 SCHEMA_PATH = ROOT / "schema" / "malt.schema.json"
@@ -362,4 +363,26 @@ def yield_basis(entry: dict) -> str | None:
     if entry.get("fermentability") is not None:
         return "fermentability"
     return None
+
+
+def product_type(name: str, slug: str) -> str:
+    """Classify a product as malt, extract, adjunct, or syrup.
+
+    This is a discover-once heuristic based on the catalogues' naming:
+    extracts are labelled LME/DME/extract/Maltoferm/CBW/BriesSweet; syrups
+    contain "syrup"; flakes, torrefied grains, raw/unmalted grains, and rice
+    hulls are adjuncts. Malt flours remain "malt" (they are milled malt).
+    """
+    text = f"{slug} {name}".lower()
+    if "syrup" in text:
+        return "syrup"
+    if re.search(r"\b(extract|lme|dme|maltoferm|cbw)\b", text) or "briessweet" in text:
+        return "extract"
+    if re.search(
+        r"\b(flake|flaked|flakes|torrefied|hull|hulls|raw|unmalted|adjunct)\b",
+        text,
+    ):
+        return "adjunct"
+    return "malt"
+
 

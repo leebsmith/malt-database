@@ -62,6 +62,10 @@ def main(argv: list[str]) -> int:
         if m.get("category") not in CATEGORIES:
             errors.append(f"{label}: bad category {m.get('category')!r}")
 
+        ptype = m.get("product_type")
+        if ptype not in ("malt", "extract", "adjunct", "syrup"):
+            errors.append(f"{label}: missing/invalid product_type {ptype!r}")
+
         for field in ("name", "description", "notes"):
             val = m.get(field)
             if isinstance(val, str):
@@ -118,7 +122,11 @@ def main(argv: list[str]) -> int:
     basis_counts = Counter(
         m["yield_basis"] for m in entries if m.get("yield_basis")
     )
+    ptype_counts = Counter(
+        m["product_type"] for m in entries if m.get("product_type")
+    )
     print(f"  yield_basis     {dict(basis_counts)}")
+    print(f"  product_type    {dict(ptype_counts)}")
     print("quality check passed")
     return 0
 
