@@ -93,6 +93,15 @@ Specialty). `fetch-fawcett.sh` writes `index.tsv` (`slug`, `category`, `url`);
 from the IOB/EBC/ASBC spec tables: prefer ASBC (`ASBC Colour Lovibond`), fall
 back to EBC, then IOB (LDK converted to %).
 
+### Gambrinus (product sitemap)
+
+`make gambrinus` reads `product-sitemap.xml` (18 malts) via the shared
+`bin/fetch-sitemap.sh`. Each page has an `<h1>` name, a short blurb
+(`p.section-single-product__short-desc`, often empty) and a long description
+(`div.section-single-product__description`); specs are key/value pairs in
+`.section-single-product__spec` (Colour Lovibond/SRM/EBC, Extract FG Min).
+Colour prefers Lovibond, then SRM, then EBC.
+
 ## Canonical schema
 
 Required fields: `name`, `maltster`, `category`.
@@ -118,6 +127,10 @@ Per-maltster normalization lives in `lib/malt.py` and is dispatched by
 - **Fawcett** — prefers the ASBC table's Lovibond range (midpoint); falls back
   to EBC (converted, `x0.508`) when ASBC is empty, or IOB (extract LDK `/3.866`,
   EBC colour). Category comes from the listing's `<h2>` via `category_hint`.
+- **Gambrinus** — colour midpoint from `Colour Lovibond` (fallback SRM, then EBC
+  `x0.508`); `extract_pct` from `Extract FG Min`. Uses the short blurb as
+  `description` and the long prose as `notes` when both exist, otherwise the
+  long prose is the description.
 - `category` assigned by `lib.malt.classify_category()`.
 
 ## Crawling etiquette
@@ -145,6 +158,9 @@ skips pages already present in `data/source/`; `make clean` forces a re-fetch.
   a duplicate spring-pale variant. Pages without an ASBC table use EBC
   (`x0.508`); IOB-only pages (Dextrin) convert LDK `/3.866`. EBC→Lovibond is an
   approximation.
+- Gambrinus only publishes `Extract FG Min` on some malts, so `yield_fraction`
+  is omitted for the rest (e.g. Vienna, Munich, Honey). Chit has no Lovibond, so
+  its colour comes from SRM.
 - Briess dark roasted malts, flours, and rice hulls publish no
   yield/fermentability, so `yield_fraction` is omitted for those entries.
 - Category classification is keyword-based with curated overrides

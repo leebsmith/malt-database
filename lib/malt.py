@@ -157,11 +157,32 @@ def _fawcett_yield(entry: dict) -> float | None:
     return round(extract / 100, 4) if extract is not None else None
 
 
+def _gambrinus_color(entry: dict) -> float | None:
+    # Prefer Lovibond; SRM passes through (~Lovibond); EBC is converted.
+    vals = [
+        v
+        for v in (entry.get("color_min"), entry.get("color_max"))
+        if v is not None
+    ]
+    if not vals:
+        return None
+    value = sum(vals) / len(vals)
+    if (entry.get("color_unit") or "").lower() == "ebc":
+        value *= 0.508
+    return round(value, 2)
+
+
+def _gambrinus_yield(entry: dict) -> float | None:
+    extract = entry.get("extract_pct")
+    return round(extract / 100, 4) if extract is not None else None
+
+
 _COLOR = {
     "briess": _briess_color,
     "bairds": _bairds_color,
     "simpsons": _simpsons_color,
     "fawcett": _fawcett_color,
+    "gambrinus": _gambrinus_color,
 }
 
 _YIELD = {
@@ -169,6 +190,7 @@ _YIELD = {
     "bairds": _bairds_yield,
     "simpsons": _simpsons_yield,
     "fawcett": _fawcett_yield,
+    "gambrinus": _gambrinus_yield,
 }
 
 
