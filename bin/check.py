@@ -60,11 +60,11 @@ def main(argv: list[str]) -> int:
             errors.append(f"{label}: empty name")
 
         ptype = m.get("product_type")
-        if ptype not in ("malt", "extract", "adjunct", "syrup"):
+        if ptype not in ("malt", "extract", "adjunct", "syrup", "sugar"):
             errors.append(f"{label}: missing/invalid product_type {ptype!r}")
 
         category = m.get("category")
-        if ptype in ("extract", "syrup"):
+        if ptype in ("extract", "syrup", "sugar"):
             if category is not None:
                 errors.append(
                     f"{label}: {ptype} should not be categorized (got {category!r})"
@@ -104,14 +104,17 @@ def main(argv: list[str]) -> int:
         if len(names) > 1:
             errors.append(f"{maltster}: duplicate name(s): {names}")
 
-    n = len(entries)
-    print(f"checked {n} malts in {db_path}")
+    # Completeness floors apply to the core malt dataset; sugar/extract/
+    # adjunct/syrup sources are supplementary and often lack descriptions.
+    core = [m for m in entries if m.get("product_type") == "malt"]
+    n = len(core)
+    print(f"checked {len(entries)} entries ({n} malts) in {db_path}")
     for field, floor in THRESHOLDS.items():
-        have = sum(1 for m in entries if m.get(field) not in (None, ""))
+        have = sum(1 for m in core if m.get(field) not in (None, ""))
         frac = have / n if n else 0.0
         ok = frac >= floor
         print(
-            f"  {field:16} {have:4}/{n}  {frac * 100:5.1f}%  "
+            f"  malt {field:16} {have:4}/{n}  {frac * 100:5.1f}%  "
             f"(floor {floor * 100:.0f}%)  {'ok' if ok else 'LOW'}"
         )
         if not ok:

@@ -1,6 +1,6 @@
 # Columns: maltster, entry_url, discovery_type, format
-# discovery_type: listing | sitemap | pdf-index
-# format: html | pdf
+# discovery_type: listing | sitemap | pdf-index | dataset
+# format: html | pdf | sqlite
 maltster	entry_url	discovery_type	format
 briess	https://brewingwithbriess.com/products/	listing	html
 bairds	https://www.bairds-malt.co.uk/divi_mega_pro/malt-menu/	listing	html
@@ -12,3 +12,4 @@ bestmalz	https://bestmalz.de/en/bestmalz-bestmalts-the-best-in-beer/	listing	htm
 dingemans	https://www.dingemansmout.be/sitemap.xml	sitemap	html
 canada-malting	https://canadamalting.com/malts-sitemap.xml	sitemap	html
 crisp	https://crispmalt.com/malts-sitemap.xml	sitemap	html
+brewtarget	https://raw.githubusercontent.com/Brewtarget/brewtarget/main/data/default_db.sqlite	dataset	sqlite

@@ -1,4 +1,4 @@
-MALSTERS := briess bairds simpsons fawcett gambrinus great-western bestmalz dingemans canada-malting crisp
+MALSTERS := briess bairds simpsons fawcett gambrinus great-western bestmalz dingemans canada-malting crisp brewtarget
 
 DB := data/db/malts.json
 
@@ -29,6 +29,8 @@ canada-malting: data/maltsters/canada-malting.json
 
 crisp: data/maltsters/crisp.json
 
+brewtarget: data/maltsters/brewtarget.json
+
 data/source/briess/products.html: bin/fetch-briess.sh bin/fetch.sh
 	bin/fetch-briess.sh
 
@@ -58,6 +60,9 @@ data/source/canada-malting/_sitemap.xml: bin/fetch-canada-malting.sh bin/fetch-s
 
 data/source/crisp/_sitemap.xml: bin/fetch-crisp.sh bin/fetch-sitemap.sh bin/fetch.sh
 	bin/fetch-crisp.sh
+
+data/source/brewtarget/default_db.sqlite: bin/fetch-brewtarget.sh bin/fetch.sh
+	bin/fetch-brewtarget.sh
 
 data/maltsters/briess.json: data/source/briess/products.html bin/process-briess.sh bin/validate.py bin/briess.jq
 	bin/process-briess.sh
@@ -98,6 +103,10 @@ data/maltsters/canada-malting.json: data/source/canada-malting/_sitemap.xml bin/
 data/maltsters/crisp.json: data/source/crisp/_sitemap.xml bin/process-crisp.sh bin/validate.py bin/crisp.jq
 	bin/process-crisp.sh
 	python3 bin/validate.py crisp
+
+data/maltsters/brewtarget.json: data/source/brewtarget/default_db.sqlite bin/process-brewtarget.sh bin/extract_brewtarget.py bin/validate.py schema/brewtarget.schema.json
+	bin/process-brewtarget.sh
+	python3 bin/validate.py brewtarget
 
 $(DB): $(MALSTERS:%=data/maltsters/%.json) bin/unify.py lib/malt.py
 	python3 bin/unify.py

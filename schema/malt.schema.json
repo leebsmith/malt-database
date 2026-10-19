@@ -7,7 +7,7 @@
   "required": ["name", "maltster"],
   "properties": {
     "name":           { "type": "string" },
-    "maltster":       { "type": "string", "enum": ["Briess","Simpsons","Fawcett","Weyermann","Bairds","Dingemans","Muntons","Gambrinus","Great Western","Bestmalz","Canada Malting","Crisp"] },
+    "maltster":       { "type": "string", "enum": ["Briess","Simpsons","Fawcett","Weyermann","Bairds","Dingemans","Muntons","Gambrinus","Great Western","Bestmalz","Canada Malting","Crisp","Brewtarget"] },
     "yield_fraction": { "type": "number", "minimum": 0, "maximum": 1 },
     "yield_basis":    { "type": "string", "enum": ["extract", "fermentability"] },
     "color_lovibond": { "type": "number", "minimum": 0 },
@@ -15,13 +15,13 @@
     "description":    { "type": "string" },
     "sold_out":       { "type": "boolean" },
     "category":       { "type": "string", "enum": ["BASE","ROASTED","CRYSTAL","ACIDULATED"] },
-    "product_type":   { "type": "string", "enum": ["malt","extract","adjunct","syrup"] }
+    "product_type":   { "type": "string", "enum": ["malt","extract","adjunct","syrup","sugar"] }
   },
   "allOf": [
     {
       "if": {
         "required": ["product_type"],
-        "properties": { "product_type": { "enum": ["extract", "syrup"] } }
+        "properties": { "product_type": { "enum": ["extract", "syrup", "sugar"] } }
       },
       "then": { "not": { "required": ["category"] } },
       "else": { "required": ["category"] }

@@ -38,7 +38,7 @@ the canonical schema, non-empty names, no HTML entities, colour in 0–1000,
 yield in 0–1 with a valid `yield_basis`, a valid `product_type`, `category`
 present for malt/adjunct (and absent for extract/syrup), no duplicate names
 within a maltster, and completeness floors (colour ≥90%, yield ≥80%, description ≥90%,
-notes ≥65%).
+notes ≥65%) computed over `product_type == "malt"` entries.
 
 ## Workflow (Briess example)
 
@@ -157,6 +157,16 @@ with Parameter/IoB/EBC/ASBC columns. Table shape varies: colour prefers a `°L`
 cell, else the last EBC cell; extract uses the last `%` cell, else `L°/kg`
 (`/3.866`). Products whose title image marks "Sold Out" get `sold_out: true`.
 
+### Sugars (Brewtarget, open data)
+
+`make brewtarget` downloads Brewtarget's GPLv3 `default_db.sqlite` and extracts
+the `ftype = 'sugar'` rows (15 after deduplication): cane/beet sugar, dextrose,
+brown sugar, demerara, invert, turbinado, molasses, corn/maple syrup, lactose,
+and **Candi Sugar Clear/Amber/Dark**. Brewtarget stores colour in SRM and
+fine-grind extract (%); both are normalized. These entries are `product_type`
+`sugar`/`syrup`, carry `yield_basis: extract`, and are intentionally
+uncategorized (late additions).
+
 ## Canonical schema
 
 Required fields: `name`, `maltster`, and `category` for malt and adjunct
@@ -164,18 +174,18 @@ products.
 Optional: `yield_fraction` (0..1) with `yield_basis` (`extract` or
 `fermentability`), `color_lovibond`, `notes`, `description`, `sold_out`
 (only where the source reports availability), and `product_type`
-(`malt` | `extract` | `adjunct` | `syrup`).
+(`malt` | `extract` | `adjunct` | `syrup` | `sugar`).
 
 `yield_basis` says what `yield_fraction` means: `extract` = fine-grind extract
 (includes Briess's "Yield on grind", verified against its Typical Analysis
 sheet), `fermentability` = Briess extracts/adjuncts.
 
 `product_type` separates actual malt from extracts, adjuncts (flakes,
-torrefied/raw/unmalted grains, rice hulls), and syrups. `category` is a
-mash-pH classification: it is set for `malt` and `adjunct` products, but
-**intentionally omitted for `extract` and `syrup`** because they are not
-mashed (extracts are dissolved; syrups are late additions). Consumers that use
-`category` directly should filter on `product_type`.
+torrefied/raw/unmalted grains, rice hulls), syrups, and sugars. `category` is
+a mash-pH classification: it is set for `malt` and `adjunct` products, but
+**intentionally omitted for `extract`, `syrup`, and `sugar`** because they are
+not mashed (extracts are dissolved; syrups/sugars are late additions).
+Consumers that use `category` directly should filter on `product_type`.
 
 `category` is one of `BASE`, `ROASTED`, `CRYSTAL`, `ACIDULATED`.
 
@@ -218,6 +228,8 @@ HTML-unescaped in `unify.py`.
   via `category_hint` (Base/Specialty/Adjunct/Other all map to `BASE`).
 - **Crisp** — colour from a `°L` cell (else last EBC `x0.508`); extract from the
   last `%` cell (else `L°/kg /3.866`). `sold_out` is carried into the DB.
+- **Brewtarget** — sugar rows: `extract_pct` from `fine_grind_yield_pct`, colour
+  from SRM; `product_type` is `sugar` or `syrup`; uncategorized.
 - `yield_basis` is `extract` for all extract/yield-on-grind figures and
   `fermentability` for Briess extracts/adjuncts.
 - `category` assigned by `lib.malt.classify_category()`.
@@ -275,6 +287,10 @@ present in `data/source/`; `make clean` forces a re-fetch.
   completeness. Some special-edition/duplicate pages exist (e.g. `chit-malt`
   vs `chitmalt`). A few products (flaked grains, rice hulls, peated/pot-still)
   publish no colour; "No 19 Maris Otter" publishes no extract.
+- Sugar source: Brewtarget (GPLv3). It provides Candi Sugar Clear/Amber/Dark
+  with yield/colour but **no liquid Candi Syrup with yield**; specific Belgian
+  candi syrup products would need another source. Sugar rows have no
+  descriptions/notes, so completeness floors are computed over malts only.
 - Briess dark roasted malts, flours, and rice hulls publish no
   yield/fermentability, so `yield_fraction` is omitted for those entries.
 - Category classification is keyword-based with curated overrides

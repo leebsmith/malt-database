@@ -74,14 +74,14 @@ def main():
             color = color_to_lovibond(maltster, entry)
             yield_fraction = extract_to_yield(maltster, entry)
             basis = yield_basis(entry)
-            ptype = product_type(name, slug)
+            ptype = entry.get("product_type") or product_type(name, slug)
 
             malt = {
                 "name": name,
                 "maltster": maltster,
                 "product_type": ptype,
             }
-            if ptype not in ("extract", "syrup"):
+            if ptype not in ("extract", "syrup", "sugar"):
                 malt["category"] = classify_category(
                     maltster, name, slug, entry.get("category_hint")
                 )
