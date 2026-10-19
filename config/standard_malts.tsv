@@ -1,0 +1,67 @@
+name	aliases	family	form	color_lovibond_min	color_lovibond_max	yield_ppg	notes
+Pilsner Malt	Pilsen, Pilsner	base	malted	1.5	2.5	37	Clean, pale base malt for lagers.
+Pale Ale Malt	2-Row, Pale Malt	base	malted	2.0	3.0	38	Standard American/British base malt.
+Lager Malt	Lager	base	malted	1.5	2.0	37	Light base for lagers.
+Mild Ale Malt	Mild	base	malted	3.0	4.0	36	Higher residual body; mild and brown ales.
+6-Row Malt	6-Row	base	malted	1.5	2.0	35	High husk/enzyme; classic US adjunct base.
+Wheat Malt	Pale Wheat, White Wheat	base	malted	2.0	3.0	39	Foam and body; wheat beers.
+Dark Wheat Malt	Dark Wheat	base	malted	6.0	9.0	39	Darker wheat for dunkelweizen.
+Rye Malt	Rye	base	malted	3.0	4.0	38	Spicy; roggenbier and rye ales.
+Malted Oats	Oat Malt	base	malted	1.5	2.0	33	Silky mouthfeel; hazy/soft styles.
+Malted Spelt	Spelt, Dinkel	base	malted	2.0	3.0	36	Ancient-grain base.
+Vienna Malt	Vienna	kilned	malted	3.0	4.0	36	Toasty, amber; Vienna lager and märzen.
+Munich Light	Munich I, Munich 10L	kilned	malted	6.0	10.0	35	Malty; märzen, bock, altbier.
+Munich Dark	Munich II, Munich 20L	kilned	malted	15.0	20.0	34	Rich malt; dunkel, bock.
+Aromatic Malt	Aromatic Munich, Aroma	kilned	malted	18.0	22.0	35	Intense malt; Belgian ales.
+Melanoidin Malt	Melanoidin	kilned	malted	20.0	30.0	35	Melanoidin richness and body.
+Amber Malt	Amber	kilned	malted	20.0	30.0	34	Toasty/biscuity; British ales.
+Brown Malt	Brown	kilned	malted	50.0	70.0	33	Toasted-brown; porter and brown ale.
+Biscuit Malt	Biscuit	kilned	malted	20.0	30.0	34	Bready, biscuity.
+Victory Malt	Victory	kilned	malted	25.0	30.0	34	Toasty, nutty.
+Honey Malt	Brumalt	kilned	malted	15.0	25.0	34	Honey/bread; melanoidin-style.
+Toasted Oats	Toasted Oat Malt	toasted	malted	2.0	8.0	28	Toasty oats; body.
+Toasted Wheat	Toasted Wheat	toasted	malted	20.0	30.0	33	Toasty wheat; body.
+Toasted Rye	Toasted Rye	toasted	malted	15.0	25.0	33	Toasty rye; spice.
+Dextrin Malt	Carapils, Cara-Foam, Dextra-Pils	dextrin	malted	1.0	2.0	32	Body and foam; minimal colour.
+Chit Malt	Chit	chit	malted	1.5	2.0	25	Under-modified; foam/body, very low colour.
+Acidulated Malt	Sauermalz, Acid Malt	acidulated	malted	2.0	3.0	34	Lowers mash pH; use 1-10%.
+Smoked Malt	Rauchmalt	smoked	malted	2.0	5.0	35	Beechwood/cherry/oak smoke.
+Peated Malt	Peated	peated	malted	1.5	3.5	36	Phenolic peat smoke.
+Caramel 10L	Cara 10, Crystal 10	crystal	malted	8.0	12.0	34	Light caramel sweetness.
+Caramel 20L	Cara 20, Crystal 20	crystal	malted	18.0	22.0	34	Light caramel sweetness.
+Caramel 30L	Cara 30, Crystal 30	crystal	malted	25.0	35.0	34	Caramel sweetness.
+Caramel 40L	Cara 40, Crystal 40	crystal	malted	35.0	45.0	34	Caramel sweetness.
+Caramel 60L	Cara 60, Crystal 60	crystal	malted	55.0	65.0	34	Caramel/toffee.
+Caramel 80L	Cara 80, Crystal 80	crystal	malted	75.0	85.0	34	Toffee/caramel.
+Caramel 100L	Cara 100, Crystal 100	crystal	malted	95.0	105.0	34	Deep caramel.
+Caramel 120L	Cara 120, Crystal 120	crystal	malted	115.0	125.0	34	Deep caramel, burnt sugar.
+Caramel 150L	Cara 150, Crystal 150	crystal	malted	145.0	155.0	34	Dark caramel.
+Extra Dark Crystal	Crystal 200L, Cara 200	crystal	malted	195.0	205.0	34	Very dark caramel.
+Special B	Special B	crystal	malted	130.0	160.0	34	Raisin/plum; dubbel and quad.
+CaraMunich	CaraMunich	crystal	malted	50.0	60.0	34	Munich-style crystal.
+CaraVienne	CaraVienne	crystal	malted	20.0	25.0	34	Vienna-style crystal.
+CaraAroma	CaraAroma	crystal	malted	120.0	140.0	34	Aromatic crystal.
+CaraAmber	CaraAmber	crystal	malted	25.0	35.0	34	Amber crystal.
+CaraRed	CaraRed	crystal	malted	20.0	25.0	34	Red crystal.
+Crystal Wheat	CaraWheat	crystal	malted	50.0	60.0	34	Wheat crystal.
+Crystal Rye	CaraRye	crystal	malted	80.0	100.0	34	Rye crystal.
+Golden Naked Oats	GNO, Crystal Oat	crystal	malted	5.0	9.0	33	Naked-oat crystal; body.
+Pale Chocolate	Pale Chocolate, Carafa I	roasted	malted	190.0	210.0	30	Husked; light coffee/cocoa, some astringency.
+Chocolate Malt	Chocolate, Carafa II	roasted	malted	340.0	370.0	28	Husked; chocolate/coffee; stouts and porters.
+Black Malt	Black, Carafa III	roasted	malted	500.0	550.0	27	Husked; black colour and roast, astringent.
+Roasted Barley	Roast Barley	roasted	unmalted	300.0	350.0	28	Unmalted (husked); dry stout.
+Dehusked Light Roasted	Carafa Special I	dehusked	malted	115.0	140.0	30	Huskless; smooth roast, no astringency.
+Dehusked Chocolate	Carafa Special II, Mroost 900	dehusked	malted	300.0	340.0	28	Huskless; smooth chocolate/coffee.
+Debittered Coffee Malt	Coffee Malt, Debittered Black	dehusked	malted	400.0	450.0	28	Huskless/debittered; coffee, less harsh.
+Dehusked Black	Carafa Special III, Blackprinz, Mroost 1400, Black Malt Extra	dehusked	malted	500.0	550.0	27	Huskless black; smooth, less bitter.
+Dehusked Black Wheat	Midnight Wheat	dehusked	malted	500.0	550.0	27	Huskless black wheat.
+Flaked Barley	Flaked Barley	flaked	flaked	1.5	2.5	32	Unmalted; body, head retention.
+Flaked Wheat	Flaked Wheat	flaked	flaked	1.5	2.5	33	Unmalted; body, haze.
+Flaked Oats	Flaked Oats	flaked	flaked	1.5	2.5	32	Unmalted; silky body.
+Flaked Rye	Flaked Rye	flaked	flaked	2.0	3.0	32	Unmalted; rye spice.
+Flaked Maize	Flaked Corn	flaked	flaked	1.0	2.0	37	Light adjunct; dry finish.
+Flaked Rice	Flaked Rice	flaked	flaked	1.0	1.5	37	Light adjunct; crisp finish.
+Torrefied Wheat	Torrified Wheat	raw	torrefied	1.5	2.5	33	Pre-gelatinized; body and foam.
+Raw Wheat	Unmalted Wheat	raw	raw	1.5	2.5	36	Unmalted; turbidity and body.
+Raw Rye	Unmalted Rye	raw	raw	2.0	3.0	36	Unmalted; rye spice.
+Rice Hulls	Rice Hulls	adjunct	hulls	0.0	0.0	0	Lautering aid; no extract/colour.
