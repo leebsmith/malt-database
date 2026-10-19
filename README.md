@@ -26,9 +26,17 @@ validates the intermediate, then maps it to the canonical `malt.schema.json`.
 ```
 make source     download + cache raw assets for all maltsters
 make <maltster> process cached source -> data/maltsters/<maltster>.json
-make db         unify all maltster JSON -> data/db/malts.json (validated)
+make db         unify -> data/db/malts.json, then run the quality check
+make check      run the quality gate on data/db/malts.json
 make clean      remove data/
 ```
+
+## Quality gate
+
+`make check` (also run at the end of `make db`) validates `data/db/malts.json`:
+the canonical schema, non-empty names, no HTML entities, colour in 0–1000,
+yield in 0–1, no duplicate names within a maltster, and completeness floors
+(colour ≥90%, yield ≥80%, description ≥90%, notes ≥65%).
 
 ## Workflow (Briess example)
 

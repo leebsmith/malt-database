@@ -1,0 +1,116 @@
+#!/usr/bin/env python3
+"""Quality gate for the unified database.
+
+Usage: check.py [path-to-db]
+
+Checks the canonical DB for structural/range/entity/duplicate problems and
+field completeness. Exits non-zero on any failure. Run automatically by
+`make check` (and therefore `make db`).
+"""
+
+import json
+import re
+import sys
+from collections import defaultdict
+from pathlib import Path
+
+from jsonschema import Draft202012Validator
+
+ROOT = Path(__file__).resolve().parent.parent
+DEFAULT_DB = ROOT / "data" / "db" / "malts.json"
+SCHEMA = ROOT / "schema" / "malt.schema.json"
+
+ENTITY = re.compile(r"&(?:[A-Za-z][A-Za-z0-9]*|#[0-9]+|#x[0-9A-Fa-f]+);")
+CATEGORIES = {"BASE", "ROASTED", "CRYSTAL", "ACIDULATED"}
+
+# Conservative completeness floors (fraction of entries that must have a value).
+THRESHOLDS = {
+    "color_lovibond": 0.90,
+    "yield_fraction": 0.80,
+    "description": 0.90,
+    "notes": 0.65,
+}
+
+
+def norm_name(name: str) -> str:
+    name = name.replace("\u00ae", "").replace("\u2122", "")
+    return re.sub(r"\s+", " ", name).strip().lower()
+
+
+def main(argv: list[str]) -> int:
+    db_path = Path(argv[1]) if len(argv) > 1 else DEFAULT_DB
+    if not db_path.exists():
+        print(f"error: {db_path} not found; run `make db`", file=sys.stderr)
+        return 1
+
+    entries = json.loads(db_path.read_text())
+    validator = Draft202012Validator(json.loads(SCHEMA.read_text()))
+
+    errors: list[str] = []
+    seen: dict[tuple[str, str], list[str]] = defaultdict(list)
+
+    for i, m in enumerate(entries):
+        label = f"[{i}] {m.get('maltster', '?')} / {m.get('name', '?')}"
+
+        for e in validator.iter_errors(m):
+            errors.append(f"{label}: schema: {e.message}")
+
+        name = m.get("name", "")
+        if not name.strip():
+            errors.append(f"{label}: empty name")
+
+        if m.get("category") not in CATEGORIES:
+            errors.append(f"{label}: bad category {m.get('category')!r}")
+
+        for field in ("name", "description", "notes"):
+            val = m.get(field)
+            if isinstance(val, str):
+                match = ENTITY.search(val)
+                if match:
+                    errors.append(f"{label}: HTML entity in {field}: {match.group(0)}")
+
+        color = m.get("color_lovibond")
+        if color is not None and (
+            not isinstance(color, (int, float)) or color < 0 or color > 1000
+        ):
+            errors.append(f"{label}: colour out of range: {color!r}")
+
+        y = m.get("yield_fraction")
+        if y is not None and (
+            not isinstance(y, (int, float)) or not (0 < y <= 1)
+        ):
+            errors.append(f"{label}: yield out of range: {y!r}")
+
+        seen[(m.get("maltster", ""), norm_name(name))].append(name)
+
+    for (maltster, _key), names in seen.items():
+        if len(names) > 1:
+            errors.append(f"{maltster}: duplicate name(s): {names}")
+
+    n = len(entries)
+    print(f"checked {n} malts in {db_path}")
+    for field, floor in THRESHOLDS.items():
+        have = sum(1 for m in entries if m.get(field) not in (None, ""))
+        frac = have / n if n else 0.0
+        ok = frac >= floor
+        print(
+            f"  {field:16} {have:4}/{n}  {frac * 100:5.1f}%  "
+            f"(floor {floor * 100:.0f}%)  {'ok' if ok else 'LOW'}"
+        )
+        if not ok:
+            errors.append(
+                f"completeness: {field} {frac * 100:.1f}% < {floor * 100:.0f}%"
+            )
+
+    if errors:
+        for err in errors:
+            print(f"FAIL: {err}", file=sys.stderr)
+        print(f"quality check failed: {len(errors)} problem(s)", file=sys.stderr)
+        return 1
+
+    print("quality check passed")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

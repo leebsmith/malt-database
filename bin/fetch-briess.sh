@@ -7,3 +7,5 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 "$ROOT/bin/fetch.sh" \
   "https://brewingwithbriess.com/products/" \
   "$ROOT/data/source/briess/products.html"
+
+touch "$ROOT/data/source/briess/products.html"

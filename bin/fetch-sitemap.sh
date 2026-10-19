@@ -50,3 +50,4 @@ for url in "${urls[@]}"; do
 done
 
 printf '%s: %d products, %d newly fetched\n' "$maltster" "${#urls[@]}" "$fetched"
+touch "$SITEMAP"

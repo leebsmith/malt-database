@@ -49,3 +49,4 @@ while IFS=$'\t' read -r slug category url; do
 done < "$INDEX"
 
 printf 'fawcett: %d malts, %d newly fetched\n' "$n" "$fetched"
+touch "$LISTING"

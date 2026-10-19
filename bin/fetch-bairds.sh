@@ -41,3 +41,4 @@ for url in "${links[@]}"; do
 done
 
 printf 'bairds: %d total malts, %d newly fetched\n' "${#links[@]}" "$fetched"
+touch "$MENU"

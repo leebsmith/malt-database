@@ -46,3 +46,4 @@ for p in "${paths[@]}"; do
 done
 
 printf 'simpsons: %d total malts, %d newly fetched\n' "${#paths[@]}" "$fetched"
+touch "$INDEX"

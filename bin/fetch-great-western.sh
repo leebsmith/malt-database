@@ -44,3 +44,4 @@ for url in "${urls[@]}"; do
 done
 
 printf 'great-western: %d products, %d newly fetched\n' "${#urls[@]}" "$fetched"
+touch "$LISTING"

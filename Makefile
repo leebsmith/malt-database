@@ -1,6 +1,8 @@
 MALSTERS := briess bairds simpsons fawcett gambrinus great-western bestmalz dingemans canada-malting crisp
 
-.PHONY: all source db clean $(MALSTERS)
+DB := data/db/malts.json
+
+.PHONY: all source db check clean $(MALSTERS)
 
 all: db
 
@@ -97,8 +99,13 @@ data/maltsters/crisp.json: data/source/crisp/_sitemap.xml bin/process-crisp.sh b
 	bin/process-crisp.sh
 	python3 bin/validate.py crisp
 
-db: $(MALSTERS:%=data/maltsters/%.json) bin/unify.py lib/malt.py
+$(DB): $(MALSTERS:%=data/maltsters/%.json) bin/unify.py lib/malt.py
 	python3 bin/unify.py
+
+check: $(DB) bin/check.py
+	python3 bin/check.py
+
+db: check
 
 clean:
 	rm -rf data

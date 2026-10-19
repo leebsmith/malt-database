@@ -43,3 +43,4 @@ for url in "${urls[@]}"; do
 done
 
 printf 'bestmalz: %d malts, %d newly fetched\n' "${#urls[@]}" "$fetched"
+touch "$LISTING"
