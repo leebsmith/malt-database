@@ -61,6 +61,14 @@ CATEGORY_MAP = {
         "best-special-x": "ROASTED",
         "best-rostaed-wheat-medium": "ROASTED",
     },
+    "dingemans": {
+        "aroma-100-md": "ROASTED",
+        "aroma-150-md": "ROASTED",
+        "melanoidin-md": "ROASTED",
+        "amber-aromatic%C2%AE-md": "ROASTED",
+        "organic-biscuit%C2%AE-md": "ROASTED",
+        "organic-mroost-1400-md": "ROASTED",
+    },
 }
 
 # Per-maltster category headings -> canonical category. Used when the catalog
@@ -71,6 +79,11 @@ CATEGORY_HINT_MAP = {
         "crystal malts": "CRYSTAL",
         "roast malts": "ROASTED",
         "specialty malts": "BASE",
+    },
+    "dingemans": {
+        "kilned malts": "BASE",
+        "caramalised malts": "CRYSTAL",
+        "roasted malts": "ROASTED",
     },
 }
 
@@ -229,6 +242,20 @@ def _bestmalz_yield(entry: dict) -> float | None:
     return round(extract / 100, 4) if extract is not None else None
 
 
+def _dingemans_color(entry: dict) -> float | None:
+    value = entry.get("color_value")
+    if value is None:
+        return None
+    if (entry.get("color_unit") or "").lower() == "ebc":
+        value *= 0.508
+    return round(value, 2)
+
+
+def _dingemans_yield(entry: dict) -> float | None:
+    extract = entry.get("extract_pct")
+    return round(extract / 100, 4) if extract is not None else None
+
+
 _COLOR = {
     "briess": _briess_color,
     "bairds": _bairds_color,
@@ -237,6 +264,7 @@ _COLOR = {
     "gambrinus": _gambrinus_color,
     "great western": _great_western_color,
     "bestmalz": _bestmalz_color,
+    "dingemans": _dingemans_color,
 }
 
 _YIELD = {
@@ -247,6 +275,7 @@ _YIELD = {
     "gambrinus": _gambrinus_yield,
     "great western": _great_western_yield,
     "bestmalz": _bestmalz_yield,
+    "dingemans": _dingemans_yield,
 }
 
 

@@ -118,6 +118,15 @@ description in the sibling `div.*-dynamichtml` blocks, and a spec table
 the Lovibond after `/`) and `Extract ...` in %. European decimal commas are
 normalized to dots. Bestmalz has no separate notes field.
 
+### Dingemans (sitemap)
+
+`make dingemans` reads `sitemap.xml` (36 `/malt/<slug>` pages, honoring the
+10 s crawl-delay). Each page has `<h1>` (name), a `Type of malt` taxonomy term
+(used as `category_hint`), a `field-name-body` description, a `Flavour` key
+spec (notes), and `#group-specs` Drupal fields. `Lovibond` is taken directly
+(decimal comma normalized), with `Colour EBC` as fallback; extract comes from
+`Extract fine D.M.`.
+
 ## Canonical schema
 
 Required fields: `name`, `maltster`, `category`.
@@ -152,15 +161,20 @@ Per-maltster normalization lives in `lib/malt.py` and is dispatched by
 - **Bestmalz** — colour midpoint from the `Wort color` row's Lovibond value
   (after `/`); `extract_pct` from `Extract ...`. Decimal commas become dots.
   No notes field.
+- **Dingemans** — `Lovibond` (fallback EBC `x0.508`) and `Extract fine D.M.`;
+  decimal commas become dots. Category comes from the `Type of malt` term via
+  `category_hint` (with slug overrides for organic/dark kilned specialties);
+  notes from the `Flavour` field.
 - `category` assigned by `lib.malt.classify_category()`.
 
 ## Crawling etiquette
 
 `bin/fetch.sh` identifies as `BotMaltHomebrewer/0.1 (+leeb@lee-smith.org)` with
 a `From: leeb@lee-smith.org` header, and sleeps `SLEEP_SECONDS` (default 2)
-after each download. Maltsters may override it: Bairds sets `SLEEP_SECONDS=10`
-to honor its robots.txt `Crawl-delay: 10`. Fetching is cached — `make <maltster>`
-skips pages already present in `data/source/`; `make clean` forces a re-fetch.
+after each download. Maltsters may override it: Bairds, Great Western, and
+Dingemans set `SLEEP_SECONDS=10` to honor their robots.txt `Crawl-delay: 10`.
+Fetching is cached — `make <maltster>` skips pages already present in
+`data/source/`; `make clean` forces a re-fetch.
 
 ## Known limitations
 
@@ -186,6 +200,10 @@ skips pages already present in `data/source/`; `make clean` forces a re-fetch.
   omitted; colour is SRM (treated as ~Lovibond).
 - Bestmalz has no notes field; its `Wort color` is `EBC / L` (we take Lovibond).
   Some malts (e.g. Roasted Barley) publish no extract.
+- Dingemans `Type of malt` groups some dark specialties under "Kilned" and mixes
+  organics under "Organic"; slug overrides classify Aroma, Melanoidin,
+  Amber-Aromatic, and the organic Biscuit/Mroost correctly. `Chocolate Rye` has
+  no extract.
 - Briess dark roasted malts, flours, and rice hulls publish no
   yield/fermentability, so `yield_fraction` is omitted for those entries.
 - Category classification is keyword-based with curated overrides
