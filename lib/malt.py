@@ -135,14 +135,15 @@ def _to_lovibond(value: float, unit: str | None) -> float:
     """Convert a colour value in the given unit to Lovibond.
 
     SRM -> Lovibond uses the standard approximation SRM = 1.3546*L - 0.76.
-    EBC -> Lovibond uses EBC = 1.97*SRM (with SRM approximately Lovibond).
+    EBC -> Lovibond goes EBC -> SRM (EBC = 1.97*SRM) -> Lovibond.
     Values already in Lovibond pass through unchanged.
     """
     u = (unit or "").lower()
     if u == "srm":
         return (value + 0.76) / 1.3546
     if u == "ebc":
-        return value * 0.508
+        srm = value / 1.97
+        return (srm + 0.76) / 1.3546
     return value
 
 
@@ -325,6 +326,22 @@ def _brewtarget_yield(entry: dict) -> float | None:
     return round(extract / 100, 4) if extract is not None else None
 
 
+def _williams_color(entry: dict) -> float | None:
+    vals = [
+        v
+        for v in (entry.get("color_min"), entry.get("color_max"))
+        if v is not None
+    ]
+    if not vals:
+        return None
+    return round(_to_lovibond(sum(vals) / len(vals), entry.get("color_unit")), 2)
+
+
+def _williams_yield(entry: dict) -> float | None:
+    extract = entry.get("extract_pct")
+    return round(extract / 100, 4) if extract is not None else None
+
+
 _COLOR = {
     "briess": _briess_color,
     "bairds": _bairds_color,
@@ -337,6 +354,7 @@ _COLOR = {
     "canada malting": _canada_malting_color,
     "crisp": _crisp_color,
     "brewtarget": _brewtarget_color,
+    "williams brewing": _williams_color,
 }
 
 _YIELD = {
@@ -351,6 +369,7 @@ _YIELD = {
     "canada malting": _canada_malting_yield,
     "crisp": _crisp_yield,
     "brewtarget": _brewtarget_yield,
+    "williams brewing": _williams_yield,
 }
 
 

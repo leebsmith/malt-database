@@ -167,6 +167,15 @@ fine-grind extract (%); both are normalized. These entries are `product_type`
 `sugar`/`syrup`, carry `yield_basis: extract`, and are intentionally
 uncategorized (late additions).
 
+### Candi syrups (Williams Brewing)
+
+`make williams` fetches Williams Brewing's candi-syrup category and its two
+products — **Belgian Amber** and **Dark** candi syrup, produced by Candico.
+The specs live in each page's schema.org Product JSON-LD description: colour
+in EBC and sugar content in Brix. Brix is used as `extract_pct` /
+`yield_fraction` (`yield_basis: extract`), and colour is converted
+EBC -> SRM -> Lovibond. These are `product_type: syrup` and uncategorized.
+
 ## Canonical schema
 
 Required fields: `name`, `maltster`, and `category` for malt and adjunct
@@ -193,9 +202,9 @@ Consumers that use `category` directly should filter on `product_type`.
 
 Per-maltster normalization lives in `lib/malt.py` and is dispatched by
 `bin/unify.py`. A shared `_to_lovibond(value, unit)` converts SRM
-(`°L = (SRM + 0.76)/1.3546`) and EBC (`x0.508`) to Lovibond; only Briess's
-"SRM" is passed through because it already matches Lovibond. Text fields are
-HTML-unescaped in `unify.py`.
+(`°L = (SRM + 0.76)/1.3546`) and EBC (via SRM: `EBC/1.97`, then Lovibond);
+only Briess's "SRM" is passed through because it already matches Lovibond.
+Text fields are HTML-unescaped in `unify.py`.
 
 - **Briess** — `color_srm` -> `color_lovibond` (pass-through; Briess's "SRM"
   matches its Lovibond product naming); `yield_on_grind` or `fermentability`
@@ -208,7 +217,7 @@ HTML-unescaped in `unify.py`.
   midpoint (`color_lovibond_min`/`color_lovibond_max` -> `color_lovibond`);
   `extract_pct` -> `yield_fraction`. No unit conversion needed.
 - **Fawcett** — prefers the ASBC table's Lovibond range (midpoint); falls back
-  to EBC (converted, `x0.508`) when ASBC is empty, or IOB (extract LDK `/3.866`,
+  to EBC (converted via SRM) when ASBC is empty, or IOB (extract LDK `/3.866`,
   EBC colour). Category comes from the listing's `<h2>` via `category_hint`.
 - **Gambrinus** — colour midpoint from `Colour Lovibond` (fallback SRM, then EBC,
   both converted); `extract_pct` from `Extract FG Min`. Uses the short blurb as
@@ -219,17 +228,20 @@ HTML-unescaped in `unify.py`.
 - **Bestmalz** — colour midpoint from the `Wort color` row's Lovibond value
   (after `/`); `extract_pct` from `Extract ...`. Decimal commas become dots.
   No notes field.
-- **Dingemans** — `Lovibond` (fallback EBC `x0.508`) and `Extract fine D.M.`;
+- **Dingemans** — `Lovibond` (fallback EBC, converted via SRM) and `Extract fine D.M.`;
   decimal commas become dots. Category comes from the `Type of malt` term via
   `category_hint` (with slug overrides for organic/dark kilned specialties);
   notes from the `Flavour` field.
 - **Canada Malting** — colour midpoint from `Colour °L` (fallback `Colour SRM`,
   converted); `extract_pct` from `Extract %`. Category comes from the `h3` type
   via `category_hint` (Base/Specialty/Adjunct/Other all map to `BASE`).
-- **Crisp** — colour from a `°L` cell (else last EBC `x0.508`); extract from the
+- **Crisp** — colour from a `°L` cell (else last EBC, converted via SRM); extract from the
   last `%` cell (else `L°/kg /3.866`). `sold_out` is carried into the DB.
 - **Brewtarget** — sugar rows: `extract_pct` from `fine_grind_yield_pct`, colour
   from SRM; `product_type` is `sugar` or `syrup`; uncategorized.
+- **Williams Brewing** — candi syrup: colour from the EBC range in the Product
+  JSON-LD, extract from the Brix range; `product_type` is `syrup`;
+  uncategorized.
 - `yield_basis` is `extract` for all extract/yield-on-grind figures and
   `fermentability` for Briess extracts/adjuncts.
 - `category` assigned by `lib.malt.classify_category()`.
@@ -266,7 +278,7 @@ present in `data/source/`; `make clean` forces a re-fetch.
   isn't the packaging line); unmalted adjuncts are included as `BASE`.
 - Fawcett uses the **brewing** category (37), excluding its distilling malt and
   a duplicate spring-pale variant. Pages without an ASBC table use EBC
-  (`x0.508`); IOB-only pages (Dextrin) convert LDK `/3.866`. EBC→Lovibond is an
+  (via SRM); IOB-only pages (Dextrin) convert LDK `/3.866`. EBC→Lovibond is an
   approximation.
 - Gambrinus only publishes `Extract FG Min` on some malts, so `yield_fraction`
   is omitted for the rest (e.g. Vienna, Munich, Honey). Chit has no Lovibond, so
@@ -287,10 +299,14 @@ present in `data/source/`; `make clean` forces a re-fetch.
   completeness. Some special-edition/duplicate pages exist (e.g. `chit-malt`
   vs `chitmalt`). A few products (flaked grains, rice hulls, peated/pot-still)
   publish no colour; "No 19 Maris Otter" publishes no extract.
-- Sugar source: Brewtarget (GPLv3). It provides Candi Sugar Clear/Amber/Dark
-  with yield/colour but **no liquid Candi Syrup with yield**; specific Belgian
-  candi syrup products would need another source. Sugar rows have no
-  descriptions/notes, so completeness floors are computed over malts only.
+- Sugar sources: Brewtarget (GPLv3) provides generic sugars and Candi Sugar
+  Clear/Amber/Dark with yield/colour. Williams Brewing adds Belgian **Amber**
+  and **Dark** candi syrup (Candico), using EBC colour and Brix as extract.
+  Other candi grades (e.g. clear/special) are not yet included. Sugar rows have
+  no descriptions/notes, so completeness floors are computed over malts only.
+- EBC -> Lovibond is `(EBC/1.97 + 0.76)/1.3546` (via SRM); an earlier version
+  used `EBC x 0.508`, which overestimated dark colours and was corrected when
+  the candi syrups were added.
 - Briess dark roasted malts, flours, and rice hulls publish no
   yield/fermentability, so `yield_fraction` is omitted for those entries.
 - Category classification is keyword-based with curated overrides

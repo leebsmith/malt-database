@@ -7,7 +7,7 @@
   "required": ["name", "maltster"],
   "properties": {
     "name":           { "type": "string" },
-    "maltster":       { "type": "string", "enum": ["Briess","Simpsons","Fawcett","Weyermann","Bairds","Dingemans","Muntons","Gambrinus","Great Western","Bestmalz","Canada Malting","Crisp","Brewtarget"] },
+    "maltster":       { "type": "string", "enum": ["Briess","Simpsons","Fawcett","Weyermann","Bairds","Dingemans","Muntons","Gambrinus","Great Western","Bestmalz","Canada Malting","Crisp","Brewtarget","Williams Brewing"] },
     "yield_fraction": { "type": "number", "minimum": 0, "maximum": 1 },
     "yield_basis":    { "type": "string", "enum": ["extract", "fermentability"] },
     "color_lovibond": { "type": "number", "minimum": 0 },
