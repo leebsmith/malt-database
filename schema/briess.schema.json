@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "briess.schema.json",
+  "title": "Briess intermediate malt",
+  "description": "Raw, maltster-native fields extracted from the Briess listing page.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "slug", "maltster"],
+  "properties": {
+    "name":           { "type": "string", "minLength": 1 },
+    "slug":           { "type": "string", "minLength": 1 },
+    "maltster":       { "type": "string", "const": "Briess" },
+    "description":    { "type": "string" },
+    "notes":          { "type": "string" },
+    "color_srm":      { "type": ["number", "null"] },
+    "yield_on_grind": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+    "fermentability": { "type": ["number", "null"], "minimum": 0, "maximum": 100 }
+  }
+}

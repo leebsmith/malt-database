@@ -1,0 +1,5 @@
+# Columns: maltster, entry_url, discovery_type, format
+# discovery_type: listing | sitemap | pdf-index
+# format: html | pdf
+maltster	entry_url	discovery_type	format
+briess	https://brewingwithbriess.com/products/	listing	html

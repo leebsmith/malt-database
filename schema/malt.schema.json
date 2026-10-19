@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "malt.schema.json",
+  "title": "Malt",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["name", "maltster", "category"],
+  "properties": {
+    "name":           { "type": "string" },
+    "maltster":       { "type": "string", "enum": ["Briess","Simpsons","Fawcett","Weyermann","Bairds","Dingemans","Muntons"] },
+    "yield_fraction": { "type": "number", "minimum": 0, "maximum": 1 },
+    "color_lovibond": { "type": "number", "minimum": 0 },
+    "notes":          { "type": "string" },
+    "description":    { "type": "string" },
+    "category":       { "type": "string", "enum": ["BASE","ROASTED","CRYSTAL","ACIDULATED"] }
+  }
+}
