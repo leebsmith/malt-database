@@ -64,10 +64,10 @@ def main(argv: list[str]) -> int:
             errors.append(f"{label}: missing/invalid product_type {ptype!r}")
 
         category = m.get("category")
-        if ptype == "syrup":
+        if ptype in ("extract", "syrup"):
             if category is not None:
                 errors.append(
-                    f"{label}: syrup should not be categorized (got {category!r})"
+                    f"{label}: {ptype} should not be categorized (got {category!r})"
                 )
         elif category not in CATEGORIES:
             errors.append(f"{label}: bad/missing category {category!r}")

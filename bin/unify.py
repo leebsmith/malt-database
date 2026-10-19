@@ -81,7 +81,7 @@ def main():
                 "maltster": maltster,
                 "product_type": ptype,
             }
-            if ptype != "syrup":
+            if ptype not in ("extract", "syrup"):
                 malt["category"] = classify_category(
                     maltster, name, slug, entry.get("category_hint")
                 )

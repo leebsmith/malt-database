@@ -21,7 +21,7 @@
     {
       "if": {
         "required": ["product_type"],
-        "properties": { "product_type": { "const": "syrup" } }
+        "properties": { "product_type": { "enum": ["extract", "syrup"] } }
       },
       "then": { "not": { "required": ["category"] } },
       "else": { "required": ["category"] }
