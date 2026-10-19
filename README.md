@@ -35,8 +35,9 @@ make clean      remove data/
 
 `make check` (also run at the end of `make db`) validates `data/db/malts.json`:
 the canonical schema, non-empty names, no HTML entities, colour in 0–1000,
-yield in 0–1, no duplicate names within a maltster, and completeness floors
-(colour ≥90%, yield ≥80%, description ≥90%, notes ≥65%).
+yield in 0–1 with a valid `yield_basis`, no duplicate names within a maltster,
+and completeness floors (colour ≥90%, yield ≥80%, description ≥90%,
+notes ≥65%).
 
 ## Workflow (Briess example)
 
@@ -158,8 +159,13 @@ cell, else the last EBC cell; extract uses the last `%` cell, else `L°/kg`
 ## Canonical schema
 
 Required fields: `name`, `maltster`, `category`.
-Optional: `yield_fraction` (0..1), `color_lovibond`, `notes`, `description`,
-`sold_out` (only where the source reports availability).
+Optional: `yield_fraction` (0..1) with `yield_basis` (`extract` or
+`fermentability`), `color_lovibond`, `notes`, `description`, and `sold_out`
+(only where the source reports availability).
+
+`yield_basis` says what `yield_fraction` means: `extract` = fine-grind extract
+(includes Briess's "Yield on grind", verified against its Typical Analysis
+sheet), `fermentability` = Briess extracts/adjuncts.
 
 `category` is one of `BASE`, `ROASTED`, `CRYSTAL`, `ACIDULATED`.
 
@@ -202,6 +208,8 @@ HTML-unescaped in `unify.py`.
   via `category_hint` (Base/Specialty/Adjunct/Other all map to `BASE`).
 - **Crisp** — colour from a `°L` cell (else last EBC `x0.508`); extract from the
   last `%` cell (else `L°/kg /3.866`). `sold_out` is carried into the DB.
+- `yield_basis` is `extract` for all extract/yield-on-grind figures and
+  `fermentability` for Briess extracts/adjuncts.
 - `category` assigned by `lib.malt.classify_category()`.
 
 ## Crawling etiquette
@@ -220,6 +228,12 @@ present in `data/source/`; `make clean` forces a re-fetch.
   passed through unconverted. All other SRM/EBC sources are converted by
   `_to_lovibond()` (SRM->Lovibond uses `(SRM + 0.76)/1.3546`, which is an
   approximation, especially for very dark malts).
+- Yield: all `extract` figures are fine-grind extract. Briess's web "Yield on
+  grind" was checked against its Typical Analysis sheet and matches the
+  `Extract FG` column (35/36); the exception is **Heritage Gold™ Malt**, where
+  the website (75%) disagrees with the sheet (82%) — we keep the website value.
+  A few LDK-derived extracts (Fawcett IOB, Crisp IOB-only) are converted and
+  recorded as `extract`.
 - Bairds colours are ranges collapsed to a midpoint and converted from SRM;
   the range itself is not retained in the canonical DB.
 - Some Bairds malts (High Enzyme Distilling, Organic, Toll) publish no

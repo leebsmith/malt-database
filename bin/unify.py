@@ -23,6 +23,7 @@ from lib.malt import (
     color_to_lovibond,
     extract_to_yield,
     normalize_name,
+    yield_basis,
 )
 
 MALTSTERS_DIR = ROOT / "data" / "maltsters"
@@ -71,6 +72,7 @@ def main():
 
             color = color_to_lovibond(maltster, entry)
             yield_fraction = extract_to_yield(maltster, entry)
+            basis = yield_basis(entry)
 
             malt = {
                 "name": name,
@@ -87,6 +89,8 @@ def main():
                 malt["color_lovibond"] = color
             if yield_fraction is not None:
                 malt["yield_fraction"] = yield_fraction
+                if basis is not None:
+                    malt["yield_basis"] = basis
             if entry.get("sold_out") is not None:
                 malt["sold_out"] = entry["sold_out"]
 

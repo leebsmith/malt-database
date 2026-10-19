@@ -345,3 +345,21 @@ def extract_to_yield(maltster: str, entry: dict) -> float | None:
     """Map a raw intermediate entry's extract to a 0..1 yield fraction."""
     fn = _YIELD.get((maltster or "").lower())
     return fn(entry) if fn else None
+
+
+def yield_basis(entry: dict) -> str | None:
+    """Describe what yield_fraction represents.
+
+    Every published extract/yield figure we use is fine-grind extract, except
+    the fermentability values Briess publishes for extracts/adjuncts (Briess's
+    web "Yield on grind" was verified against its Typical Analysis sheet to be
+    the Extract FG / fine-grind value).
+    """
+    if entry.get("extract_pct") is not None:
+        return "extract"
+    if entry.get("yield_on_grind") is not None:
+        return "extract"
+    if entry.get("fermentability") is not None:
+        return "fermentability"
+    return None
+

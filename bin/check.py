@@ -11,7 +11,7 @@ field completeness. Exits non-zero on any failure. Run automatically by
 import json
 import re
 import sys
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 
 from jsonschema import Draft202012Validator
@@ -81,6 +81,13 @@ def main(argv: list[str]) -> int:
         ):
             errors.append(f"{label}: yield out of range: {y!r}")
 
+        basis = m.get("yield_basis")
+        if y is not None:
+            if basis not in ("extract", "fermentability"):
+                errors.append(f"{label}: missing/invalid yield_basis {basis!r}")
+        elif basis is not None:
+            errors.append(f"{label}: yield_basis without yield_fraction")
+
         seen[(m.get("maltster", ""), norm_name(name))].append(name)
 
     for (maltster, _key), names in seen.items():
@@ -108,6 +115,10 @@ def main(argv: list[str]) -> int:
         print(f"quality check failed: {len(errors)} problem(s)", file=sys.stderr)
         return 1
 
+    basis_counts = Counter(
+        m["yield_basis"] for m in entries if m.get("yield_basis")
+    )
+    print(f"  yield_basis     {dict(basis_counts)}")
     print("quality check passed")
     return 0
 
