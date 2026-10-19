@@ -59,12 +59,18 @@ def main(argv: list[str]) -> int:
         if not name.strip():
             errors.append(f"{label}: empty name")
 
-        if m.get("category") not in CATEGORIES:
-            errors.append(f"{label}: bad category {m.get('category')!r}")
-
         ptype = m.get("product_type")
         if ptype not in ("malt", "extract", "adjunct", "syrup"):
             errors.append(f"{label}: missing/invalid product_type {ptype!r}")
+
+        category = m.get("category")
+        if ptype == "syrup":
+            if category is not None:
+                errors.append(
+                    f"{label}: syrup should not be categorized (got {category!r})"
+                )
+        elif category not in CATEGORIES:
+            errors.append(f"{label}: bad/missing category {category!r}")
 
         for field in ("name", "description", "notes"):
             val = m.get(field)

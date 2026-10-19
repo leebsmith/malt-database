@@ -35,9 +35,10 @@ make clean      remove data/
 
 `make check` (also run at the end of `make db`) validates `data/db/malts.json`:
 the canonical schema, non-empty names, no HTML entities, colour in 0–1000,
-yield in 0–1 with a valid `yield_basis`, a valid `product_type`, no duplicate
-names within a maltster, and completeness floors (colour ≥90%, yield ≥80%,
-description ≥90%, notes ≥65%).
+yield in 0–1 with a valid `yield_basis`, a valid `product_type`, `category`
+present for non-syrups (and absent for syrups), no duplicate names within a
+maltster, and completeness floors (colour ≥90%, yield ≥80%, description ≥90%,
+notes ≥65%).
 
 ## Workflow (Briess example)
 
@@ -158,7 +159,8 @@ cell, else the last EBC cell; extract uses the last `%` cell, else `L°/kg`
 
 ## Canonical schema
 
-Required fields: `name`, `maltster`, `category`.
+Required fields: `name`, `maltster`, and `category` for all products except
+syrups.
 Optional: `yield_fraction` (0..1) with `yield_basis` (`extract` or
 `fermentability`), `color_lovibond`, `notes`, `description`, `sold_out`
 (only where the source reports availability), and `product_type`
@@ -169,10 +171,11 @@ Optional: `yield_fraction` (0..1) with `yield_basis` (`extract` or
 sheet), `fermentability` = Briess extracts/adjuncts.
 
 `product_type` separates actual malt from extracts, adjuncts (flakes,
-torrefied/raw/unmalted grains, rice hulls), and syrups. Non-malt products still
-carry a coarse `category` (usually `BASE`), so a consumer that treats
-`category` as malt type (e.g. a mash-pH calculator) should filter to
-`product_type == "malt"` or handle the other types explicitly.
+torrefied/raw/unmalted grains, rice hulls), and syrups. `category` is a
+mash-pH classification: it is set for `malt`, `extract`, and `adjunct`
+products, but **intentionally omitted for `syrup`** because syrups are late
+additions and never enter the mash. Consumers that use `category` directly
+should filter on `product_type` and skip syrups.
 
 `category` is one of `BASE`, `ROASTED`, `CRYSTAL`, `ACIDULATED`.
 

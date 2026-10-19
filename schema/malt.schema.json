@@ -4,7 +4,7 @@
   "title": "Malt",
   "type": "object",
   "additionalProperties": true,
-  "required": ["name", "maltster", "category"],
+  "required": ["name", "maltster"],
   "properties": {
     "name":           { "type": "string" },
     "maltster":       { "type": "string", "enum": ["Briess","Simpsons","Fawcett","Weyermann","Bairds","Dingemans","Muntons","Gambrinus","Great Western","Bestmalz","Canada Malting","Crisp"] },
@@ -16,5 +16,15 @@
     "sold_out":       { "type": "boolean" },
     "category":       { "type": "string", "enum": ["BASE","ROASTED","CRYSTAL","ACIDULATED"] },
     "product_type":   { "type": "string", "enum": ["malt","extract","adjunct","syrup"] }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": ["product_type"],
+        "properties": { "product_type": { "const": "syrup" } }
+      },
+      "then": { "not": { "required": ["category"] } },
+      "else": { "required": ["category"] }
+    }
+  ]
 }

@@ -74,15 +74,17 @@ def main():
             color = color_to_lovibond(maltster, entry)
             yield_fraction = extract_to_yield(maltster, entry)
             basis = yield_basis(entry)
+            ptype = product_type(name, slug)
 
             malt = {
                 "name": name,
                 "maltster": maltster,
-                "category": classify_category(
-                    maltster, name, slug, entry.get("category_hint")
-                ),
-                "product_type": product_type(name, slug),
+                "product_type": ptype,
             }
+            if ptype != "syrup":
+                malt["category"] = classify_category(
+                    maltster, name, slug, entry.get("category_hint")
+                )
             if entry.get("description"):
                 malt["description"] = html.unescape(entry["description"])
             if entry.get("notes"):
@@ -113,7 +115,9 @@ def main():
 
     by_category = {}
     for malt in malts:
-        by_category[malt["category"]] = by_category.get(malt["category"], 0) + 1
+        category = malt.get("category")
+        if category is not None:
+            by_category[category] = by_category.get(category, 0) + 1
 
     print(f"wrote {len(malts)} malts -> {DB_PATH}")
     print("categories:", by_category)
