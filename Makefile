@@ -1,4 +1,4 @@
-MALSTERS := briess bairds
+MALSTERS := briess bairds simpsons
 
 .PHONY: all source db clean $(MALSTERS)
 
@@ -11,11 +11,16 @@ briess: data/maltsters/briess.json
 
 bairds: data/maltsters/bairds.json
 
+simpsons: data/maltsters/simpsons.json
+
 data/source/briess/products.html: bin/fetch-briess.sh bin/fetch.sh
 	bin/fetch-briess.sh
 
 data/source/bairds/malt-menu.html: bin/fetch-bairds.sh bin/fetch.sh
 	bin/fetch-bairds.sh
+
+data/source/simpsons/our-malts.html: bin/fetch-simpsons.sh bin/fetch.sh
+	bin/fetch-simpsons.sh
 
 data/maltsters/briess.json: data/source/briess/products.html bin/process-briess.sh bin/validate.py bin/briess.jq
 	bin/process-briess.sh
@@ -24,6 +29,10 @@ data/maltsters/briess.json: data/source/briess/products.html bin/process-briess.
 data/maltsters/bairds.json: data/source/bairds/malt-menu.html bin/process-bairds.sh bin/validate.py bin/bairds.jq
 	bin/process-bairds.sh
 	python3 bin/validate.py bairds
+
+data/maltsters/simpsons.json: data/source/simpsons/our-malts.html bin/process-simpsons.sh bin/validate.py bin/simpsons.jq
+	bin/process-simpsons.sh
+	python3 bin/validate.py simpsons
 
 db: $(MALSTERS:%=data/maltsters/%.json) bin/unify.py lib/malt.py
 	python3 bin/unify.py

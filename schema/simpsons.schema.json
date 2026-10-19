@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "simpsons.schema.json",
+  "title": "Simpsons intermediate malt",
+  "description": "Raw, maltster-native fields extracted from a Simpsons malt page.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "slug", "maltster"],
+  "properties": {
+    "name":               { "type": "string", "minLength": 1 },
+    "slug":               { "type": "string", "minLength": 1 },
+    "maltster":           { "type": "string", "const": "Simpsons" },
+    "description":        { "type": "string" },
+    "notes":              { "type": "string" },
+    "extract_pct":        { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+    "color_lovibond_min": { "type": ["number", "null"], "minimum": 0 },
+    "color_lovibond_max": { "type": ["number", "null"], "minimum": 0 }
+  }
+}

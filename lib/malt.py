@@ -37,6 +37,13 @@ CATEGORY_MAP = {
         "brown-malt": "ROASTED",
         "dextrin-malt": "CRYSTAL",
     },
+    "simpsons": {
+        "amber-malt": "ROASTED",
+        "brown-malt": "ROASTED",
+        "export-pale-brown": "ROASTED",
+        "dextrin-malt": "CRYSTAL",
+        "simpsons-drc": "CRYSTAL",
+    },
 }
 
 
@@ -84,22 +91,42 @@ def _briess_yield(entry: dict) -> float | None:
     extract = entry.get("yield_on_grind")
     if extract is None:
         extract = entry.get("fermentability")
-    return extract / 100 if extract is not None else None
+    return round(extract / 100, 4) if extract is not None else None
 
 
 def _bairds_yield(entry: dict) -> float | None:
     extract = entry.get("extract_pct")
-    return extract / 100 if extract is not None else None
+    return round(extract / 100, 4) if extract is not None else None
+
+
+def _simpsons_color(entry: dict) -> float | None:
+    # Simpsons ASBC tab already reports Lovibond; collapse the range to a
+    # midpoint (single values have min == max).
+    vals = [
+        v
+        for v in (entry.get("color_lovibond_min"), entry.get("color_lovibond_max"))
+        if v is not None
+    ]
+    if not vals:
+        return None
+    return round(sum(vals) / len(vals), 2)
+
+
+def _simpsons_yield(entry: dict) -> float | None:
+    extract = entry.get("extract_pct")
+    return round(extract / 100, 4) if extract is not None else None
 
 
 _COLOR = {
     "briess": _briess_color,
     "bairds": _bairds_color,
+    "simpsons": _simpsons_color,
 }
 
 _YIELD = {
     "briess": _briess_yield,
     "bairds": _bairds_yield,
+    "simpsons": _simpsons_yield,
 }
 
 

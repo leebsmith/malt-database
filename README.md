@@ -74,6 +74,16 @@ to `data/source/bairds/<slug>.html`. Processing reads each page's `<h1>` (name),
 the description paragraph, the "Flavour profile:" line (notes), and the ASBC
 tab's extract/colour particulars.
 
+### Simpsons (third container crawl)
+
+`make simpsons` caches `https://www.simpsonsmalt.co.uk/our-malts/`, then takes
+the malt links from the **third `.content .container`** (the only one with
+links), keeping `/our-malts/<category>/<slug>/` (45 malts). Processing reads the
+`<h1>` (name), the `#malt-page-intro` paragraphs (description), the flavour line
+inside `.substyles-list` (notes; packaging lines are skipped), and the ASBC tab
+(`#asbc`) `Extract %` and `Colour ° Lovibond` (already Lovibond, range collapsed
+to a midpoint).
+
 ## Canonical schema
 
 Required fields: `name`, `maltster`, `category`.
@@ -93,6 +103,9 @@ Per-maltster normalization lives in `lib/malt.py` and is dispatched by
   (`color_srm_min`/`color_srm_max` -> `color_lovibond`); `extract_pct` ->
   `yield_fraction`; names are title-cased (Bairds stores mixed-case text in
   the DOM and title-cases it via CSS).
+- **Simpsons** — the ASBC tab's `Colour ° Lovibond` range is collapsed to its
+  midpoint (`color_lovibond_min`/`color_lovibond_max` -> `color_lovibond`);
+  `extract_pct` -> `yield_fraction`. No unit conversion needed.
 - `category` assigned by `lib.malt.classify_category()`.
 
 ## Crawling etiquette
@@ -112,6 +125,10 @@ skips pages already present in `data/source/`; `make clean` forces a re-fetch.
   retained in the canonical DB.
 - Some Bairds malts (High Enzyme Distilling, Organic, Toll) publish no
   extract/colour, so `yield_fraction`/`color_lovibond` are omitted.
+- Simpsons colours are Lovibond ranges collapsed to a midpoint. Some peated /
+  distilling malts have no `#asbc` tab, so their extract/colour are omitted.
+- Simpsons `notes` is a best-effort heuristic (first `.substyles-list` text that
+  isn't the packaging line); unmalted adjuncts are included as `BASE`.
 - Briess dark roasted malts, flours, and rice hulls publish no
   yield/fermentability, so `yield_fraction` is omitted for those entries.
 - Category classification is keyword-based with curated overrides
