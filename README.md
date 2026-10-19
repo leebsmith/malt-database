@@ -109,6 +109,15 @@ under `.product-archive` (honoring `Crawl-delay: 10`), and extracts `h1.name`,
 `p.description`, `p.additional` (notes), and `div.stats-table p.attribute`
 pairs (`span.title` + value, notably `Color SRM`).
 
+### Bestmalz (catalog listing)
+
+`make bestmalz` caches the English catalog and takes the 43 unique
+`/en/malts/<slug>/` links under `div.malz-wrapper`. Each page has `h1` (name),
+description in the sibling `div.*-dynamichtml` blocks, and a spec table
+(`div.kt-inside-inner-col table`) with `Wort color` in `EBC / L` form (we take
+the Lovibond after `/`) and `Extract ...` in %. European decimal commas are
+normalized to dots. Bestmalz has no separate notes field.
+
 ## Canonical schema
 
 Required fields: `name`, `maltster`, `category`.
@@ -140,6 +149,9 @@ Per-maltster normalization lives in `lib/malt.py` and is dispatched by
   long prose is the description.
 - **Great Western** — colour midpoint from `Color SRM` (SRM ~= Lovibond). No
   extract is published, so `yield_fraction` is omitted.
+- **Bestmalz** — colour midpoint from the `Wort color` row's Lovibond value
+  (after `/`); `extract_pct` from `Extract ...`. Decimal commas become dots.
+  No notes field.
 - `category` assigned by `lib.malt.classify_category()`.
 
 ## Crawling etiquette
@@ -172,6 +184,8 @@ skips pages already present in `data/source/`; `make clean` forces a re-fetch.
   its colour comes from SRM.
 - Great Western publishes no extract at all, so `yield_fraction` is always
   omitted; colour is SRM (treated as ~Lovibond).
+- Bestmalz has no notes field; its `Wort color` is `EBC / L` (we take Lovibond).
+  Some malts (e.g. Roasted Barley) publish no extract.
 - Briess dark roasted malts, flours, and rice hulls publish no
   yield/fermentability, so `yield_fraction` is omitted for those entries.
 - Category classification is keyword-based with curated overrides

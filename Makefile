@@ -1,4 +1,4 @@
-MALSTERS := briess bairds simpsons fawcett gambrinus great-western
+MALSTERS := briess bairds simpsons fawcett gambrinus great-western bestmalz
 
 .PHONY: all source db clean $(MALSTERS)
 
@@ -19,6 +19,8 @@ gambrinus: data/maltsters/gambrinus.json
 
 great-western: data/maltsters/great-western.json
 
+bestmalz: data/maltsters/bestmalz.json
+
 data/source/briess/products.html: bin/fetch-briess.sh bin/fetch.sh
 	bin/fetch-briess.sh
 
@@ -36,6 +38,9 @@ data/source/gambrinus/_sitemap.xml: bin/fetch-gambrinus.sh bin/fetch-sitemap.sh 
 
 data/source/great-western/_listing.html: bin/fetch-great-western.sh bin/fetch.sh
 	bin/fetch-great-western.sh
+
+data/source/bestmalz/_listing.html: bin/fetch-bestmalz.sh bin/fetch.sh
+	bin/fetch-bestmalz.sh
 
 data/maltsters/briess.json: data/source/briess/products.html bin/process-briess.sh bin/validate.py bin/briess.jq
 	bin/process-briess.sh
@@ -60,6 +65,10 @@ data/maltsters/gambrinus.json: data/source/gambrinus/_sitemap.xml bin/process-ga
 data/maltsters/great-western.json: data/source/great-western/_listing.html bin/process-great-western.sh bin/validate.py bin/great-western.jq
 	bin/process-great-western.sh
 	python3 bin/validate.py great-western
+
+data/maltsters/bestmalz.json: data/source/bestmalz/_listing.html bin/process-bestmalz.sh bin/validate.py bin/bestmalz.jq
+	bin/process-bestmalz.sh
+	python3 bin/validate.py bestmalz
 
 db: $(MALSTERS:%=data/maltsters/%.json) bin/unify.py lib/malt.py
 	python3 bin/unify.py
