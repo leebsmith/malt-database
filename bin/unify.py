@@ -7,6 +7,7 @@ script maps those to the canonical schema (schema/malt.schema.json), assigns
 categories (lib.malt), and writes the merged, validated database.
 """
 
+import html
 import json
 import sys
 from pathlib import Path
@@ -65,7 +66,7 @@ def main():
                     continue
 
             maltster = entry.get("maltster") or key.title()
-            name = normalize_name(maltster, entry.get("name", ""))
+            name = html.unescape(normalize_name(maltster, entry.get("name", "")))
             slug = entry.get("slug", "")
 
             color = color_to_lovibond(maltster, entry)
@@ -79,9 +80,9 @@ def main():
                 ),
             }
             if entry.get("description"):
-                malt["description"] = entry["description"]
+                malt["description"] = html.unescape(entry["description"])
             if entry.get("notes"):
-                malt["notes"] = entry["notes"]
+                malt["notes"] = html.unescape(entry["notes"])
             if color is not None:
                 malt["color_lovibond"] = color
             if yield_fraction is not None:

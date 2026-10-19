@@ -158,27 +158,30 @@ Optional: `yield_fraction` (0..1), `color_lovibond`, `notes`, `description`,
 ## Normalization (intermediate -> canonical)
 
 Per-maltster normalization lives in `lib/malt.py` and is dispatched by
-`bin/unify.py`:
+`bin/unify.py`. A shared `_to_lovibond(value, unit)` converts SRM
+(`°L = (SRM + 0.76)/1.3546`) and EBC (`x0.508`) to Lovibond; only Briess's
+"SRM" is passed through because it already matches Lovibond. Text fields are
+HTML-unescaped in `unify.py`.
 
 - **Briess** — `color_srm` -> `color_lovibond` (pass-through; Briess's "SRM"
   matches its Lovibond product naming); `yield_on_grind` or `fermentability`
   -> `yield_fraction`.
-- **Bairds** — the ASBC tab's `°SRM` colour range is collapsed to its midpoint
-  (`color_srm_min`/`color_srm_max` -> `color_lovibond`); `extract_pct` ->
-  `yield_fraction`; names are title-cased (Bairds stores mixed-case text in
-  the DOM and title-cases it via CSS).
+- **Bairds** — the ASBC tab's `°SRM` colour range is collapsed to a midpoint,
+  then converted to Lovibond (`color_srm_min`/`color_srm_max` ->
+  `color_lovibond`); `extract_pct` -> `yield_fraction`; names are title-cased
+  (Bairds stores mixed-case text in the DOM and title-cases it via CSS).
 - **Simpsons** — the ASBC tab's `Colour ° Lovibond` range is collapsed to its
   midpoint (`color_lovibond_min`/`color_lovibond_max` -> `color_lovibond`);
   `extract_pct` -> `yield_fraction`. No unit conversion needed.
 - **Fawcett** — prefers the ASBC table's Lovibond range (midpoint); falls back
   to EBC (converted, `x0.508`) when ASBC is empty, or IOB (extract LDK `/3.866`,
   EBC colour). Category comes from the listing's `<h2>` via `category_hint`.
-- **Gambrinus** — colour midpoint from `Colour Lovibond` (fallback SRM, then EBC
-  `x0.508`); `extract_pct` from `Extract FG Min`. Uses the short blurb as
+- **Gambrinus** — colour midpoint from `Colour Lovibond` (fallback SRM, then EBC,
+  both converted); `extract_pct` from `Extract FG Min`. Uses the short blurb as
   `description` and the long prose as `notes` when both exist, otherwise the
   long prose is the description.
-- **Great Western** — colour midpoint from `Color SRM` (SRM ~= Lovibond). No
-  extract is published, so `yield_fraction` is omitted.
+- **Great Western** — colour midpoint from `Color SRM`, converted to Lovibond.
+  No extract is published, so `yield_fraction` is omitted.
 - **Bestmalz** — colour midpoint from the `Wort color` row's Lovibond value
   (after `/`); `extract_pct` from `Extract ...`. Decimal commas become dots.
   No notes field.
@@ -186,9 +189,9 @@ Per-maltster normalization lives in `lib/malt.py` and is dispatched by
   decimal commas become dots. Category comes from the `Type of malt` term via
   `category_hint` (with slug overrides for organic/dark kilned specialties);
   notes from the `Flavour` field.
-- **Canada Malting** — colour midpoint from `Colour °L` (fallback `Colour SRM`);
-  `extract_pct` from `Extract %`. Category comes from the `h3` type via
-  `category_hint` (Base/Specialty/Adjunct/Other all map to `BASE`).
+- **Canada Malting** — colour midpoint from `Colour °L` (fallback `Colour SRM`,
+  converted); `extract_pct` from `Extract %`. Category comes from the `h3` type
+  via `category_hint` (Base/Specialty/Adjunct/Other all map to `BASE`).
 - **Crisp** — colour from a `°L` cell (else last EBC `x0.508`); extract from the
   last `%` cell (else `L°/kg /3.866`). `sold_out` is carried into the DB.
 - `category` assigned by `lib.malt.classify_category()`.
@@ -204,11 +207,13 @@ present in `data/source/`; `make clean` forces a re-fetch.
 
 ## Known limitations
 
-- Briess reports color as **SRM**, which matches their Lovibond product naming
-  (e.g. "Caramel Malt 120L" -> SRM 120), so `color_to_lovibond()` is currently
-  a pass-through. Other units (e.g. EBC) will need real conversion per maltster.
-- Bairds colours are ranges collapsed to a midpoint; the range itself is not
-  retained in the canonical DB.
+- Briess reports color as **SRM**, but its values already match Lovibond
+  product naming (e.g. "Caramel Malt 120L" -> SRM 120), so Briess alone is
+  passed through unconverted. All other SRM/EBC sources are converted by
+  `_to_lovibond()` (SRM->Lovibond uses `(SRM + 0.76)/1.3546`, which is an
+  approximation, especially for very dark malts).
+- Bairds colours are ranges collapsed to a midpoint and converted from SRM;
+  the range itself is not retained in the canonical DB.
 - Some Bairds malts (High Enzyme Distilling, Organic, Toll) publish no
   extract/colour, so `yield_fraction`/`color_lovibond` are omitted.
 - Simpsons colours are Lovibond ranges collapsed to a midpoint. Some peated /
@@ -221,9 +226,9 @@ present in `data/source/`; `make clean` forces a re-fetch.
   approximation.
 - Gambrinus only publishes `Extract FG Min` on some malts, so `yield_fraction`
   is omitted for the rest (e.g. Vienna, Munich, Honey). Chit has no Lovibond, so
-  its colour comes from SRM.
+  its colour comes from SRM (converted).
 - Great Western publishes no extract at all, so `yield_fraction` is always
-  omitted; colour is SRM (treated as ~Lovibond).
+  omitted; colour is SRM (converted to Lovibond).
 - Bestmalz has no notes field; its `Wort color` is `EBC / L` (we take Lovibond).
   Some malts (e.g. Roasted Barley) publish no extract.
 - Dingemans `Type of malt` groups some dark specialties under "Kilned" and mixes

@@ -130,8 +130,24 @@ def normalize_name(maltster: str, name: str) -> str:
 # --- Raw intermediate -> canonical normalization -------------------------
 
 
+def _to_lovibond(value: float, unit: str | None) -> float:
+    """Convert a colour value in the given unit to Lovibond.
+
+    SRM -> Lovibond uses the standard approximation SRM = 1.3546*L - 0.76.
+    EBC -> Lovibond uses EBC = 1.97*SRM (with SRM approximately Lovibond).
+    Values already in Lovibond pass through unchanged.
+    """
+    u = (unit or "").lower()
+    if u == "srm":
+        return (value + 0.76) / 1.3546
+    if u == "ebc":
+        return value * 0.508
+    return value
+
+
 def _briess_color(entry: dict) -> float | None:
-    # Briess "SRM" values already match their Lovibond product naming.
+    # Briess "SRM" values already match their Lovibond product naming, so this
+    # is intentionally NOT run through _to_lovibond().
     return entry.get("color_srm")
 
 
@@ -143,7 +159,7 @@ def _bairds_color(entry: dict) -> float | None:
     ]
     if not vals:
         return None
-    return round(sum(vals) / len(vals), 2)
+    return round(_to_lovibond(sum(vals) / len(vals), "srm"), 2)
 
 
 def _briess_yield(entry: dict) -> float | None:
@@ -186,9 +202,7 @@ def _fawcett_color(entry: dict) -> float | None:
     if not vals:
         return None
     value = sum(vals) / len(vals)
-    if (entry.get("color_unit") or "").lower() == "ebc":
-        value *= 0.508  # EBC -> ~Lovibond (SRM ~= Lovibond)
-    return round(value, 2)
+    return round(_to_lovibond(value, entry.get("color_unit")), 2)
 
 
 def _fawcett_yield(entry: dict) -> float | None:
@@ -197,7 +211,7 @@ def _fawcett_yield(entry: dict) -> float | None:
 
 
 def _gambrinus_color(entry: dict) -> float | None:
-    # Prefer Lovibond; SRM passes through (~Lovibond); EBC is converted.
+    # Prefer Lovibond; SRM and EBC are converted to Lovibond.
     vals = [
         v
         for v in (entry.get("color_min"), entry.get("color_max"))
@@ -206,9 +220,7 @@ def _gambrinus_color(entry: dict) -> float | None:
     if not vals:
         return None
     value = sum(vals) / len(vals)
-    if (entry.get("color_unit") or "").lower() == "ebc":
-        value *= 0.508
-    return round(value, 2)
+    return round(_to_lovibond(value, entry.get("color_unit")), 2)
 
 
 def _gambrinus_yield(entry: dict) -> float | None:
@@ -225,9 +237,7 @@ def _great_western_color(entry: dict) -> float | None:
     if not vals:
         return None
     value = sum(vals) / len(vals)
-    if (entry.get("color_unit") or "").lower() == "ebc":
-        value *= 0.508
-    return round(value, 2)
+    return round(_to_lovibond(value, entry.get("color_unit")), 2)
 
 
 def _great_western_yield(entry: dict) -> float | None:
@@ -244,9 +254,7 @@ def _bestmalz_color(entry: dict) -> float | None:
     if not vals:
         return None
     value = sum(vals) / len(vals)
-    if (entry.get("color_unit") or "").lower() == "ebc":
-        value *= 0.508
-    return round(value, 2)
+    return round(_to_lovibond(value, entry.get("color_unit")), 2)
 
 
 def _bestmalz_yield(entry: dict) -> float | None:
@@ -258,9 +266,7 @@ def _dingemans_color(entry: dict) -> float | None:
     value = entry.get("color_value")
     if value is None:
         return None
-    if (entry.get("color_unit") or "").lower() == "ebc":
-        value *= 0.508
-    return round(value, 2)
+    return round(_to_lovibond(value, entry.get("color_unit")), 2)
 
 
 def _dingemans_yield(entry: dict) -> float | None:
@@ -277,9 +283,7 @@ def _canada_malting_color(entry: dict) -> float | None:
     if not vals:
         return None
     value = sum(vals) / len(vals)
-    if (entry.get("color_unit") or "").lower() == "ebc":
-        value *= 0.508
-    return round(value, 2)
+    return round(_to_lovibond(value, entry.get("color_unit")), 2)
 
 
 def _canada_malting_yield(entry: dict) -> float | None:
@@ -296,9 +300,7 @@ def _crisp_color(entry: dict) -> float | None:
     if not vals:
         return None
     value = sum(vals) / len(vals)
-    if (entry.get("color_unit") or "").lower() == "ebc":
-        value *= 0.508
-    return round(value, 2)
+    return round(_to_lovibond(value, entry.get("color_unit")), 2)
 
 
 def _crisp_yield(entry: dict) -> float | None:
