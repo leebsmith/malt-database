@@ -127,6 +127,16 @@ spec (notes), and `#group-specs` Drupal fields. `Lovibond` is taken directly
 (decimal comma normalized), with `Colour EBC` as fallback; extract comes from
 `Extract fine D.M.`.
 
+### Canada Malting (sitemap, English only)
+
+`make canada-malting` reads `malts-sitemap.xml`, keeping only the 24 English
+`/malts/<slug>/` links (the sitemap also lists French `/fr/malts/` translations,
+which are excluded). Honours the 10 s crawl-delay. Each page has
+`div.product-details` `h1` (name), `h3` (type, used as `category_hint`), and
+`p` paragraphs (description); particulars are `.product-table-row`
+(`strong` + `span.product-data`), with `Colour °L` preferred over `Colour SRM`,
+and `Extract %`.
+
 ## Canonical schema
 
 Required fields: `name`, `maltster`, `category`.
@@ -165,16 +175,19 @@ Per-maltster normalization lives in `lib/malt.py` and is dispatched by
   decimal commas become dots. Category comes from the `Type of malt` term via
   `category_hint` (with slug overrides for organic/dark kilned specialties);
   notes from the `Flavour` field.
+- **Canada Malting** — colour midpoint from `Colour °L` (fallback `Colour SRM`);
+  `extract_pct` from `Extract %`. Category comes from the `h3` type via
+  `category_hint` (Base/Specialty/Adjunct/Other all map to `BASE`).
 - `category` assigned by `lib.malt.classify_category()`.
 
 ## Crawling etiquette
 
 `bin/fetch.sh` identifies as `BotMaltHomebrewer/0.1 (+leeb@lee-smith.org)` with
 a `From: leeb@lee-smith.org` header, and sleeps `SLEEP_SECONDS` (default 2)
-after each download. Maltsters may override it: Bairds, Great Western, and
-Dingemans set `SLEEP_SECONDS=10` to honor their robots.txt `Crawl-delay: 10`.
-Fetching is cached — `make <maltster>` skips pages already present in
-`data/source/`; `make clean` forces a re-fetch.
+after each download. Maltsters may override it: Bairds, Great Western,
+Dingemans, and Canada Malting set `SLEEP_SECONDS=10` to honor their robots.txt
+`Crawl-delay: 10`. Fetching is cached — `make <maltster>` skips pages already
+present in `data/source/`; `make clean` forces a re-fetch.
 
 ## Known limitations
 
@@ -204,6 +217,10 @@ Fetching is cached — `make <maltster>` skips pages already present in
   organics under "Organic"; slug overrides classify Aroma, Melanoidin,
   Amber-Aromatic, and the organic Biscuit/Mroost correctly. `Chocolate Rye` has
   no extract.
+- Canada Malting French `/fr/malts/` pages are translations of the English
+  catalog and are excluded. Flaked grains and Food Grade Malt publish no
+  colour/extract. CMC is a base/specialty producer, so everything maps to
+  `BASE`.
 - Briess dark roasted malts, flours, and rice hulls publish no
   yield/fermentability, so `yield_fraction` is omitted for those entries.
 - Category classification is keyword-based with curated overrides
