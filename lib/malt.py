@@ -44,14 +44,34 @@ CATEGORY_MAP = {
         "dextrin-malt": "CRYSTAL",
         "simpsons-drc": "CRYSTAL",
     },
+    "fawcett": {
+        "dextrin-malt": "CRYSTAL",
+    },
+}
+
+# Per-maltster category headings -> canonical category. Used when the catalog
+# page groups products under headings (e.g. Fawcett's h2 "Base Malts").
+CATEGORY_HINT_MAP = {
+    "fawcett": {
+        "base malts": "BASE",
+        "crystal malts": "CRYSTAL",
+        "roast malts": "ROASTED",
+        "specialty malts": "BASE",
+    },
 }
 
 
-def classify_category(maltster: str, name: str, slug: str) -> str:
+def classify_category(
+    maltster: str, name: str, slug: str, hint: str | None = None
+) -> str:
     maltster = (maltster or "").lower()
     overrides = CATEGORY_MAP.get(maltster, {})
     if slug in overrides:
         return overrides[slug]
+    if hint:
+        hinted = CATEGORY_HINT_MAP.get(maltster, {}).get(hint.strip().lower())
+        if hinted:
+            return hinted
     text = f"{slug} {name}".lower()
     for category, keywords in KEYWORD_RULES:
         if any(keyword in text for keyword in keywords):
@@ -117,16 +137,38 @@ def _simpsons_yield(entry: dict) -> float | None:
     return round(extract / 100, 4) if extract is not None else None
 
 
+def _fawcett_color(entry: dict) -> float | None:
+    # Prefer ASBC Lovibond; fall back to EBC (converted) when ASBC is absent.
+    vals = [
+        v
+        for v in (entry.get("color_min"), entry.get("color_max"))
+        if v is not None
+    ]
+    if not vals:
+        return None
+    value = sum(vals) / len(vals)
+    if (entry.get("color_unit") or "").lower() == "ebc":
+        value *= 0.508  # EBC -> ~Lovibond (SRM ~= Lovibond)
+    return round(value, 2)
+
+
+def _fawcett_yield(entry: dict) -> float | None:
+    extract = entry.get("extract_pct")
+    return round(extract / 100, 4) if extract is not None else None
+
+
 _COLOR = {
     "briess": _briess_color,
     "bairds": _bairds_color,
     "simpsons": _simpsons_color,
+    "fawcett": _fawcett_color,
 }
 
 _YIELD = {
     "briess": _briess_yield,
     "bairds": _bairds_yield,
     "simpsons": _simpsons_yield,
+    "fawcett": _fawcett_yield,
 }
 
 

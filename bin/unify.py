@@ -74,7 +74,9 @@ def main():
             malt = {
                 "name": name,
                 "maltster": maltster,
-                "category": classify_category(maltster, name, slug),
+                "category": classify_category(
+                    maltster, name, slug, entry.get("category_hint")
+                ),
             }
             if entry.get("description"):
                 malt["description"] = entry["description"]

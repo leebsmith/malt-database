@@ -84,6 +84,15 @@ inside `.substyles-list` (notes; packaging lines are skipped), and the ASBC tab
 (`#asbc`) `Extract %` and `Colour ° Lovibond` (already Lovibond, range collapsed
 to a midpoint).
 
+### Fawcett (category-grouped listing)
+
+`make fawcett` caches `/our-malts/category/brewing-malts/` (37 malts), whose
+`div.malt-type` blocks group links under an `<h2>` category (Base/Crystal/Roast/
+Specialty). `fetch-fawcett.sh` writes `index.tsv` (`slug`, `category`, `url`);
+`process-fawcett.sh` passes the category as `category_hint`. Particulars come
+from the IOB/EBC/ASBC spec tables: prefer ASBC (`ASBC Colour Lovibond`), fall
+back to EBC, then IOB (LDK converted to %).
+
 ## Canonical schema
 
 Required fields: `name`, `maltster`, `category`.
@@ -106,6 +115,9 @@ Per-maltster normalization lives in `lib/malt.py` and is dispatched by
 - **Simpsons** — the ASBC tab's `Colour ° Lovibond` range is collapsed to its
   midpoint (`color_lovibond_min`/`color_lovibond_max` -> `color_lovibond`);
   `extract_pct` -> `yield_fraction`. No unit conversion needed.
+- **Fawcett** — prefers the ASBC table's Lovibond range (midpoint); falls back
+  to EBC (converted, `x0.508`) when ASBC is empty, or IOB (extract LDK `/3.866`,
+  EBC colour). Category comes from the listing's `<h2>` via `category_hint`.
 - `category` assigned by `lib.malt.classify_category()`.
 
 ## Crawling etiquette
@@ -129,6 +141,10 @@ skips pages already present in `data/source/`; `make clean` forces a re-fetch.
   distilling malts have no `#asbc` tab, so their extract/colour are omitted.
 - Simpsons `notes` is a best-effort heuristic (first `.substyles-list` text that
   isn't the packaging line); unmalted adjuncts are included as `BASE`.
+- Fawcett uses the **brewing** category (37), excluding its distilling malt and
+  a duplicate spring-pale variant. Pages without an ASBC table use EBC
+  (`x0.508`); IOB-only pages (Dextrin) convert LDK `/3.866`. EBC→Lovibond is an
+  approximation.
 - Briess dark roasted malts, flours, and rice hulls publish no
   yield/fermentability, so `yield_fraction` is omitted for those entries.
 - Category classification is keyword-based with curated overrides
