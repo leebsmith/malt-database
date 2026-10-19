@@ -342,6 +342,22 @@ def _williams_yield(entry: dict) -> float | None:
     return round(extract / 100, 4) if extract is not None else None
 
 
+def _northern_brewer_color(entry: dict) -> float | None:
+    vals = [
+        v
+        for v in (entry.get("color_min"), entry.get("color_max"))
+        if v is not None
+    ]
+    if not vals:
+        return None
+    return round(_to_lovibond(sum(vals) / len(vals), entry.get("color_unit")), 2)
+
+
+def _northern_brewer_yield(entry: dict) -> float | None:
+    extract = entry.get("extract_pct")
+    return round(extract / 100, 4) if extract is not None else None
+
+
 _COLOR = {
     "briess": _briess_color,
     "bairds": _bairds_color,
@@ -355,6 +371,8 @@ _COLOR = {
     "crisp": _crisp_color,
     "brewtarget": _brewtarget_color,
     "williams brewing": _williams_color,
+    "northern brewer": _northern_brewer_color,
+    "l.d. carlson": _northern_brewer_color,
 }
 
 _YIELD = {
@@ -370,6 +388,8 @@ _YIELD = {
     "crisp": _crisp_yield,
     "brewtarget": _brewtarget_yield,
     "williams brewing": _williams_yield,
+    "northern brewer": _northern_brewer_yield,
+    "l.d. carlson": _northern_brewer_yield,
 }
 
 

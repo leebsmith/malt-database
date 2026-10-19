@@ -176,6 +176,18 @@ in EBC and sugar content in Brix. Brix is used as `extract_pct` /
 `yield_fraction` (`yield_basis: extract`), and colour is converted
 EBC -> SRM -> Lovibond. These are `product_type: syrup` and uncategorized.
 
+### Belgian candi sugars (Northern Brewer)
+
+`make northern-brewer` reads Northern Brewer's Shopify products JSON for the
+Belgian candi sugar collection, holding **10 products** after excluding the
+vendor **Candi Syrup, Inc.** (out of business): Northern Brewer's clear/dark and
+soft blonde/brown candi sugars plus D-45/D-90/D-180/Simplicity syrups, and
+L.D. Carlson's 5 Lovibond Golden and Extra Dark syrups. Colour is parsed from
+the description (EBC range, SRM, or Lovibond; `D-90` inferred from its name).
+Extract comes from PPG (`1.032 PPG` means 32 points → ~69.6%); syrups with no
+stated PPG assume 1.032 PPG, and crystalline/soft sugars use 46 PPG (100%).
+All are uncategorized.
+
 ## Canonical schema
 
 Required fields: `name`, `maltster`, and `category` for malt and adjunct
@@ -242,6 +254,9 @@ Text fields are HTML-unescaped in `unify.py`.
 - **Williams Brewing** — candi syrup: colour from the EBC range in the Product
   JSON-LD, extract from the Brix range; `product_type` is `syrup`;
   uncategorized.
+- **Northern Brewer** — Belgian candi sugars/syrups: colour from EBC/SRM/
+  Lovibond in the description, extract from PPG (`1.032 PPG` = 32 points);
+  CSI products excluded; `product_type` is `sugar` or `syrup`; uncategorized.
 - `yield_basis` is `extract` for all extract/yield-on-grind figures and
   `fermentability` for Briess extracts/adjuncts.
 - `category` assigned by `lib.malt.classify_category()`.
@@ -300,10 +315,12 @@ present in `data/source/`; `make clean` forces a re-fetch.
   vs `chitmalt`). A few products (flaked grains, rice hulls, peated/pot-still)
   publish no colour; "No 19 Maris Otter" publishes no extract.
 - Sugar sources: Brewtarget (GPLv3) provides generic sugars and Candi Sugar
-  Clear/Amber/Dark with yield/colour. Williams Brewing adds Belgian **Amber**
-  and **Dark** candi syrup (Candico), using EBC colour and Brix as extract.
-  Other candi grades (e.g. clear/special) are not yet included. Sugar rows have
-  no descriptions/notes, so completeness floors are computed over malts only.
+  Clear/Amber/Dark; Williams Brewing adds Amber/Dark candi syrup (Candico);
+  Northern Brewer adds its Belgian candi sugars and D-45/D-90/D-180/Simplicity
+  plus L.D. Carlson's 5 Lovibond/Extra Dark, with **Candi Syrup, Inc. products
+  excluded**. Where a syrup's PPG is not stated, 1.032 PPG is assumed; soft and
+  crystalline sugars use 46 PPG. Sugar rows have no descriptions/notes, so
+  completeness floors are computed over malts only.
 - EBC -> Lovibond is `(EBC/1.97 + 0.76)/1.3546` (via SRM); an earlier version
   used `EBC x 0.508`, which overestimated dark colours and was corrected when
   the candi syrups were added.

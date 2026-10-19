@@ -1,6 +1,6 @@
 # Columns: maltster, entry_url, discovery_type, format
 # discovery_type: listing | sitemap | pdf-index | dataset
-# format: html | pdf | sqlite
+# format: html | pdf | sqlite | json
 maltster	entry_url	discovery_type	format
 briess	https://brewingwithbriess.com/products/	listing	html
 bairds	https://www.bairds-malt.co.uk/divi_mega_pro/malt-menu/	listing	html
@@ -14,3 +14,4 @@ canada-malting	https://canadamalting.com/malts-sitemap.xml	sitemap	html
 crisp	https://crispmalt.com/malts-sitemap.xml	sitemap	html
 brewtarget	https://raw.githubusercontent.com/Brewtarget/brewtarget/main/data/default_db.sqlite	dataset	sqlite
 williams	https://www.williamsbrewing.com/Home-Brewing-Supplies/Malted-Grain-Sugar/Candi-Syrups	listing	html
+northern-brewer	https://www.northernbrewer.com/collections/belgian-candi-sugar/products.json?limit=250	dataset	json
