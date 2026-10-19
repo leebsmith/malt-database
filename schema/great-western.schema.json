@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "great-western.schema.json",
+  "title": "Great Western intermediate malt",
+  "description": "Raw, maltster-native fields extracted from a Great Western malt page.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "slug", "maltster"],
+  "properties": {
+    "name":        { "type": "string", "minLength": 1 },
+    "slug":        { "type": "string", "minLength": 1 },
+    "maltster":    { "type": "string", "const": "Great Western" },
+    "description": { "type": "string" },
+    "notes":       { "type": "string" },
+    "extract_pct": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+    "color_unit":  { "type": ["string", "null"], "enum": ["lovibond", "srm", "ebc", null] },
+    "color_min":   { "type": ["number", "null"], "minimum": 0 },
+    "color_max":   { "type": ["number", "null"], "minimum": 0 }
+  }
+}

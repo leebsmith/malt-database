@@ -102,6 +102,13 @@ back to EBC, then IOB (LDK converted to %).
 `.section-single-product__spec` (Colour Lovibond/SRM/EBC, Extract FG Min).
 Colour prefers Lovibond, then SRM, then EBC.
 
+### Great Western (product listing)
+
+`make great-western` caches `/products/`, takes the 22 `/product/<slug>/` links
+under `.product-archive` (honoring `Crawl-delay: 10`), and extracts `h1.name`,
+`p.description`, `p.additional` (notes), and `div.stats-table p.attribute`
+pairs (`span.title` + value, notably `Color SRM`).
+
 ## Canonical schema
 
 Required fields: `name`, `maltster`, `category`.
@@ -131,6 +138,8 @@ Per-maltster normalization lives in `lib/malt.py` and is dispatched by
   `x0.508`); `extract_pct` from `Extract FG Min`. Uses the short blurb as
   `description` and the long prose as `notes` when both exist, otherwise the
   long prose is the description.
+- **Great Western** — colour midpoint from `Color SRM` (SRM ~= Lovibond). No
+  extract is published, so `yield_fraction` is omitted.
 - `category` assigned by `lib.malt.classify_category()`.
 
 ## Crawling etiquette
@@ -161,6 +170,8 @@ skips pages already present in `data/source/`; `make clean` forces a re-fetch.
 - Gambrinus only publishes `Extract FG Min` on some malts, so `yield_fraction`
   is omitted for the rest (e.g. Vienna, Munich, Honey). Chit has no Lovibond, so
   its colour comes from SRM.
+- Great Western publishes no extract at all, so `yield_fraction` is always
+  omitted; colour is SRM (treated as ~Lovibond).
 - Briess dark roasted malts, flours, and rice hulls publish no
   yield/fermentability, so `yield_fraction` is omitted for those entries.
 - Category classification is keyword-based with curated overrides

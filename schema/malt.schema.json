@@ -7,7 +7,7 @@
   "required": ["name", "maltster", "category"],
   "properties": {
     "name":           { "type": "string" },
-    "maltster":       { "type": "string", "enum": ["Briess","Simpsons","Fawcett","Weyermann","Bairds","Dingemans","Muntons","Gambrinus"] },
+    "maltster":       { "type": "string", "enum": ["Briess","Simpsons","Fawcett","Weyermann","Bairds","Dingemans","Muntons","Gambrinus","Great Western"] },
     "yield_fraction": { "type": "number", "minimum": 0, "maximum": 1 },
     "color_lovibond": { "type": "number", "minimum": 0 },
     "notes":          { "type": "string" },
