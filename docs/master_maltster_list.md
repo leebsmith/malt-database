@@ -7,7 +7,7 @@
 | **[Bairds](https://bairds-malt.co.uk)** | **United Kingdom** | A premier British maltster supplying high-quality base, distilling, and traditional colored roasted malts. | Done (29) |
 | **[Simpsons](https://simpsonsmalt.co.uk)** | **United Kingdom** | Famed for their legendary Golden Promise base malt and premium crystal malts used by brewers and distillers alike. | Done (45) |
 | **[Thomas Fawcett & Sons](http://fawcett-maltsters.co.uk)** | **United Kingdom** | Also known as **Faucett**, this historic family maltster still operates traditional floor maltings, famous for authentic Maris Otter and Halcyon. | Done (37) |
-| **[Muntons](https://muntons.com)** | **United Kingdom** | A massive British global exporter providing standard base malts, specialty grains, and industrial-scale malt extracts. | Next — not yet scraped |
+| **[Muntons](https://muntons.com)** | **United Kingdom** | A massive British global exporter providing standard base malts, specialty grains, and industrial-scale malt extracts. | Deferred — technical analysis (yield/colour) is PNG-only; OCR fragile |
 | **[Crisp Malt](https://crispmalt.com)** | **United Kingdom** | A major British powerhouse running classic floor maltings alongside modern plants, renowned for its heritage barley varieties. | Done (49) |
 | **[Weyermann](https://weyermann.de)** | **Germany** | The absolute gold standard for German lager and specialty malts like Barke, Carafa, and Acidulated malts. | Deferred — multilingual WooCommerce, large/complex catalog |
 | **[Bestmalz](https://bestmalz.de)** | **Germany** | A top-tier German maltster heavily utilized for exceptionally clean Pilsner, Munich, Vienna, and caramel base malts. | Done (43) |
@@ -19,3 +19,22 @@
 | **[Viking Malt](https://vikingmalt.com)** | **Northern Europe** | The dominant force across Scandinavia, the Baltics, and Poland, and the world's top producer of roasted specialty grains. | Deferred — technical details only in PDFs |
 | **[Canada Malting Co.](https://canadamalting.com)** | **Canada** | A centennial Canadian staple relied upon for clean base malt profiles and specialized grains like malted oats. | Done (24) — English only |
 | **[Gambrinus Malting](https://gambrinusmalting.com)** | **Canada** | A boutique craft favorite based in British Columbia, celebrated worldwide for their distinctive Honey Malt. | Done (18) |
+
+## Status notes
+
+### Deferred
+
+- **Weyermann** — multilingual WooCommerce (`/en-gb/product/...`), ~150 products; more complex than the current listing/sitemap pattern.
+- **Viking Malt** — product pages exist, but technical details (extract/colour) are only in PDFs; HTML specs are sparse.
+- **Muntons** — name/description/notes are in HTML, but the typical analysis (yield/colour) is a PNG screenshot shared across several products; OCR is fragile. Deferred because yield is essential.
+
+### Excluded
+
+- **Rahr Malting Co.** — corporate site; sitemaps contain only posts/pages/category/author, with no per-malt product pages.
+- **Castle Malting** — legacy/complex site (jQuery 1.4.x era); `robots.txt` and `sitemap*.xml` return 404; no extractable product/catalog links.
+- **Boortmalt** — corporate B2B site (journey/masters/sustainability pages); no per-malt catalog.
+- **Malteurop** — corporate site (COA/locations/mmcmalt pages); no per-malt product catalog.
+- **Soufflet Malt / InVivo** — site unreachable at probe time (connection failed, HTTP 000).
+
+Rahr, Malteurop, and Boortmalt could be revisited if they publish an HTML product catalog; Soufflet if the site comes back up.
+
