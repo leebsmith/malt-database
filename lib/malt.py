@@ -4,6 +4,10 @@ The category classification here is hand-curated ("discover once"): when a
 new maltster is added, its keyword rules and slug overrides are written once
 and committed, then simply looked up at build time. Nothing is discovered
 dynamically.
+
+Normalization (raw intermediate -> canonical) is also per-maltster, since each
+maltster reports colour/extract in different units (Briess: SRM + yield%/
+fermentability%; Bairds: an SRM range + extract%).
 """
 
 from pathlib import Path
@@ -28,6 +32,11 @@ CATEGORY_MAP = {
         "victory-malt": "ROASTED",
         "organic-victory-malt": "ROASTED",
     },
+    "bairds": {
+        "amber-malt": "ROASTED",
+        "brown-malt": "ROASTED",
+        "dextrin-malt": "CRYSTAL",
+    },
 }
 
 
@@ -43,14 +52,64 @@ def classify_category(maltster: str, name: str, slug: str) -> str:
     return "BASE"
 
 
-def color_to_lovibond(maltster: str, srm: float | None) -> float | None:
-    """Convert a raw color value to Lovibond.
+def normalize_name(maltster: str, name: str) -> str:
+    """Canonicalize a raw name. Bairds displays titles in title case via CSS
+    but stores mixed-case text in the DOM (e.g. "Maris Otter BLEnd"), so
+    title-casing recovers the intended name."""
+    if (maltster or "").lower() == "bairds":
+        return name.title()
+    return name
 
-    Briess reports "SRM" values that already match their Lovibond product
-    naming (e.g. "Caramel Malt 120L" -> SRM 120), so for now this is a direct
-    pass-through. Add per-maltster conversions here as other units are added
-    (e.g. EBC for Weyermann/Dingemans: Lovibond ~= EBC * 0.508).
-    """
-    if srm is None:
+
+# --- Raw intermediate -> canonical normalization -------------------------
+
+
+def _briess_color(entry: dict) -> float | None:
+    # Briess "SRM" values already match their Lovibond product naming.
+    return entry.get("color_srm")
+
+
+def _bairds_color(entry: dict) -> float | None:
+    vals = [
+        v
+        for v in (entry.get("color_srm_min"), entry.get("color_srm_max"))
+        if v is not None
+    ]
+    if not vals:
         return None
-    return round(float(srm), 2)
+    return round(sum(vals) / len(vals), 2)
+
+
+def _briess_yield(entry: dict) -> float | None:
+    extract = entry.get("yield_on_grind")
+    if extract is None:
+        extract = entry.get("fermentability")
+    return extract / 100 if extract is not None else None
+
+
+def _bairds_yield(entry: dict) -> float | None:
+    extract = entry.get("extract_pct")
+    return extract / 100 if extract is not None else None
+
+
+_COLOR = {
+    "briess": _briess_color,
+    "bairds": _bairds_color,
+}
+
+_YIELD = {
+    "briess": _briess_yield,
+    "bairds": _bairds_yield,
+}
+
+
+def color_to_lovibond(maltster: str, entry: dict) -> float | None:
+    """Map a raw intermediate entry's colour to a single Lovibond value."""
+    fn = _COLOR.get((maltster or "").lower())
+    return fn(entry) if fn else None
+
+
+def extract_to_yield(maltster: str, entry: dict) -> float | None:
+    """Map a raw intermediate entry's extract to a 0..1 yield fraction."""
+    fn = _YIELD.get((maltster or "").lower())
+    return fn(entry) if fn else None

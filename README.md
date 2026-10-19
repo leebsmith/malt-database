@@ -65,6 +65,15 @@ data/maltsters/briess.json             <- raw malt objects (per-maltster schema)
 data/db/malts.json                     <- canonical, unified
 ```
 
+### Bairds (two-level crawl)
+
+`make bairds` follows the discovery trail `robots.txt -> sitemap ->
+/divi_mega_pro/malt-menu/`. It caches the malt-menu page, extracts the 29 malt
+links (`.entry-content ul:not(.et_mobile_menu) a`), then fetches each malt page
+to `data/source/bairds/<slug>.html`. Processing reads each page's `<h1>` (name),
+the description paragraph, the "Flavour profile:" line (notes), and the ASBC
+tab's extract/colour particulars.
+
 ## Canonical schema
 
 Required fields: `name`, `maltster`, `category`.
@@ -74,18 +83,37 @@ Optional: `yield_fraction` (0..1), `color_lovibond`, `notes`, `description`.
 
 ## Normalization (intermediate -> canonical)
 
-- `color_srm` -> `color_lovibond` via `lib.malt.color_to_lovibond()`.
-- `yield_on_grind` or `fermentability` (extracts/adjuncts) -> `yield_fraction`
-  (percentage / 100).
+Per-maltster normalization lives in `lib/malt.py` and is dispatched by
+`bin/unify.py`:
+
+- **Briess** — `color_srm` -> `color_lovibond` (pass-through; Briess's "SRM"
+  matches its Lovibond product naming); `yield_on_grind` or `fermentability`
+  -> `yield_fraction`.
+- **Bairds** — the ASBC tab's `°SRM` colour range is collapsed to its midpoint
+  (`color_srm_min`/`color_srm_max` -> `color_lovibond`); `extract_pct` ->
+  `yield_fraction`; names are title-cased (Bairds stores mixed-case text in
+  the DOM and title-cases it via CSS).
 - `category` assigned by `lib.malt.classify_category()`.
+
+## Crawling etiquette
+
+`bin/fetch.sh` identifies as `BotMaltHomebrewer/0.1 (+leeb@lee-smith.org)` with
+a `From: leeb@lee-smith.org` header, and sleeps `SLEEP_SECONDS` (default 2)
+after each download. Maltsters may override it: Bairds sets `SLEEP_SECONDS=10`
+to honor its robots.txt `Crawl-delay: 10`. Fetching is cached — `make <maltster>`
+skips pages already present in `data/source/`; `make clean` forces a re-fetch.
 
 ## Known limitations
 
 - Briess reports color as **SRM**, which matches their Lovibond product naming
   (e.g. "Caramel Malt 120L" -> SRM 120), so `color_to_lovibond()` is currently
   a pass-through. Other units (e.g. EBC) will need real conversion per maltster.
-- Dark roasted malts, flours, and rice hulls publish no yield/fermentability,
-  so `yield_fraction` is omitted for those entries.
+- Bairds colours are ranges collapsed to a midpoint; the range itself is not
+  retained in the canonical DB.
+- Some Bairds malts (High Enzyme Distilling, Organic, Toll) publish no
+  extract/colour, so `yield_fraction`/`color_lovibond` are omitted.
+- Briess dark roasted malts, flours, and rice hulls publish no
+  yield/fermentability, so `yield_fraction` is omitted for those entries.
 - Category classification is keyword-based with curated overrides
   (`lib/malt.py`). Non-malt products (extracts, adjuncts, flakes, syrups) do
   not fit the malt category enum and currently fall back to `BASE`; refine in

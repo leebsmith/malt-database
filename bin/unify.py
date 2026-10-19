@@ -16,7 +16,13 @@ from jsonschema import Draft202012Validator
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from lib.malt import SCHEMA_PATH, classify_category, color_to_lovibond
+from lib.malt import (
+    SCHEMA_PATH,
+    classify_category,
+    color_to_lovibond,
+    extract_to_yield,
+    normalize_name,
+)
 
 MALTSTERS_DIR = ROOT / "data" / "maltsters"
 DB_PATH = ROOT / "data" / "db" / "malts.json"
@@ -59,15 +65,11 @@ def main():
                     continue
 
             maltster = entry.get("maltster") or key.title()
-            name = entry.get("name", "")
+            name = normalize_name(maltster, entry.get("name", ""))
             slug = entry.get("slug", "")
 
-            color = color_to_lovibond(maltster, entry.get("color_srm"))
-
-            extract = entry.get("yield_on_grind")
-            if extract is None:
-                extract = entry.get("fermentability")
-            yield_fraction = extract / 100 if extract is not None else None
+            color = color_to_lovibond(maltster, entry)
+            yield_fraction = extract_to_yield(maltster, entry)
 
             malt = {
                 "name": name,
