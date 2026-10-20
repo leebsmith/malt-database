@@ -14,6 +14,7 @@ data/         cache + generated output (gitignored)
   source/     raw cached assets, one dir per maltster
   maltsters/  intermediate JSON, one file per maltster
   db/         unified database (malts.json)
+dist/         release copy of the built DB (malts.json, git-tracked)
 ```
 
 Each maltster has its own **intermediate schema** (`schema/<maltster>.schema.json`)
@@ -28,6 +29,7 @@ make source     download + cache raw assets for all maltsters
 make <maltster> process cached source -> data/maltsters/<maltster>.json
 make db         unify -> data/db/malts.json, then run the quality check
 make check      run the quality gate on data/db/malts.json
+make dist       rebuild + check, then write dist/malts.json (the git-tracked release)
 make clean      remove data/
 ```
 

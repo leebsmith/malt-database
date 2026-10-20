@@ -1,8 +1,9 @@
 MALSTERS := briess bairds simpsons fawcett gambrinus great-western bestmalz dingemans canada-malting crisp brewtarget williams northern-brewer weyermann
 
 DB := data/db/malts.json
+DIST := dist/malts.json
 
-.PHONY: all source db check clean $(MALSTERS)
+.PHONY: all source db check dist clean $(MALSTERS)
 
 all: db
 
@@ -142,6 +143,10 @@ check: $(DB) bin/check.py
 	python3 bin/check.py
 
 db: check
+
+dist: db
+	mkdir -p $(dir $(DIST))
+	cp $(DB) $(DIST)
 
 clean:
 	rm -rf data
