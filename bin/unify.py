@@ -10,6 +10,7 @@ categories (lib.malt), and writes the merged, validated database.
 import html
 import json
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 from jsonschema import Draft202012Validator
@@ -29,6 +30,10 @@ from lib.malt import (
 
 MALTSTERS_DIR = ROOT / "data" / "maltsters"
 DB_PATH = ROOT / "data" / "db" / "malts.json"
+
+# Contract revision of the emitted envelope (schema/malt.schema.json). Bump on
+# any breaking change to the canonical shape; the importer pins against this.
+SCHEMA_VERSION = 1
 
 
 def load_schema(path: Path):
@@ -91,8 +96,9 @@ def main():
                 malt["notes"] = html.unescape(entry["notes"])
             if color is not None:
                 malt["color_lovibond"] = color
-            if entry.get("moisture_pct") is not None:
-                malt["moisture"] = entry["moisture_pct"]
+            moisture = entry.get("moisture_pct")
+            if moisture not in (None, 0):
+                malt["moisture"] = moisture
             if yield_fraction is not None:
                 malt["yield_fraction"] = yield_fraction
                 if basis is not None:
@@ -113,7 +119,12 @@ def main():
         return 1
 
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    DB_PATH.write_text(json.dumps(malts, indent=2, ensure_ascii=False) + "\n")
+    payload = {
+        "schema_version": SCHEMA_VERSION,
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "entries": malts,
+    }
+    DB_PATH.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n")
 
     by_category = {}
     for malt in malts:

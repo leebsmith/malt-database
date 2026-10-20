@@ -43,7 +43,15 @@ def main(argv: list[str]) -> int:
         print(f"error: {db_path} not found; run `make db`", file=sys.stderr)
         return 1
 
-    entries = json.loads(db_path.read_text())
+    raw = json.loads(db_path.read_text())
+    if not isinstance(raw, dict) or not isinstance(raw.get("entries"), list):
+        print(f"error: {db_path} must be the {schema_version, entries} envelope", file=sys.stderr)
+        return 1
+    entries = raw["entries"]
+    schema_version = raw.get("schema_version")
+    if not isinstance(schema_version, int):
+        print(f"error: {db_path} is missing an integer schema_version", file=sys.stderr)
+        return 1
     validator = Draft202012Validator(json.loads(SCHEMA.read_text()))
 
     errors: list[str] = []
