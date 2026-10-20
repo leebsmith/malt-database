@@ -25,6 +25,7 @@ LOV_RE = re.compile(r"(\d+(?:\.\d+)?)\s*°L", re.I)
 TITLE_LOV_RE = re.compile(r"(\d+(?:\.\d+)?)\s*Lovibond", re.I)
 TITLE_D_RE = re.compile(r"D-(\d+)", re.I)
 PPG_RE = re.compile(r"([0-9.]+)\s*PPG", re.I)
+MOISTURE_RE = re.compile(r"[Mm]oisture[^0-9]{0,20}([0-9.]+)")
 
 
 def clean(value: str) -> str:
@@ -91,6 +92,7 @@ def main() -> int:
         ptype = "syrup" if "syrup" in title.lower() else "sugar"
         unit, color_min, color_max = parse_color(title, body)
         name = SIZE_RE.sub("", title).strip() or title
+        moisture = MOISTURE_RE.search(body)
 
         entries.append(
             {
@@ -100,6 +102,7 @@ def main() -> int:
                 "product_type": ptype,
                 "description": body,
                 "extract_pct": parse_extract(body, ptype),
+                "moisture_pct": float(moisture.group(1)) if moisture else None,
                 "color_unit": unit,
                 "color_min": color_min,
                 "color_max": color_max,

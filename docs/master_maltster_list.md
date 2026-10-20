@@ -9,7 +9,7 @@
 | **[Thomas Fawcett & Sons](http://fawcett-maltsters.co.uk)** | **United Kingdom** | Also known as **Faucett**, this historic family maltster still operates traditional floor maltings, famous for authentic Maris Otter and Halcyon. | Done (37) |
 | **[Muntons](https://muntons.com)** | **United Kingdom** | A massive British global exporter providing standard base malts, specialty grains, and industrial-scale malt extracts. | Deferred — technical analysis (yield/colour) is PNG-only; OCR fragile |
 | **[Crisp Malt](https://crispmalt.com)** | **United Kingdom** | A major British powerhouse running classic floor maltings alongside modern plants, renowned for its heritage barley varieties. | Done (49) |
-| **[Weyermann](https://weyermann.de)** | **Germany** | The absolute gold standard for German lager and specialty malts like Barke, Carafa, and Acidulated malts. | Deferred — multilingual WooCommerce, large/complex catalog |
+| **[Weyermann](https://weyermann.de)** | **Germany** | The absolute gold standard for German lager and specialty malts like Barke, Carafa, and Acidulated malts. | Done (48) |
 | **[Bestmalz](https://bestmalz.de)** | **Germany** | A top-tier German maltster heavily utilized for exceptionally clean Pilsner, Munich, Vienna, and caramel base malts. | Done (43) |
 | **[Dingemans](https://www.dingemansmout.be)** | **Belgium** | Also spelled **Dingemann**, this historic family business supplies authentic base and specialty caramel/roasted malts to top Belgian Trappist breweries. | Done (36) — site is dingemansmout.be |
 | **[Castle Malting (Château)](https://castlemalting.com)** | **Belgium** | The oldest malting company in Belgium, offering an enormous catalog of premium malts for classic Belgian ale profiles. | Excluded — old/complex site, no crawlable catalog |
@@ -24,7 +24,6 @@
 
 ### Deferred
 
-- **Weyermann** — multilingual WooCommerce (`/en-gb/product/...`), ~150 products; more complex than the current listing/sitemap pattern.
 - **Viking Malt** — product pages exist, but technical details (extract/colour) are only in PDFs; HTML specs are sparse.
 - **Muntons** — name/description/notes are in HTML, but the typical analysis (yield/colour) is a PNG screenshot shared across several products; OCR is fragile. Deferred because yield is essential.
 

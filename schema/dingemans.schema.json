@@ -14,6 +14,7 @@
     "description": { "type": "string" },
     "notes":       { "type": "string" },
     "extract_pct": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+    "moisture_pct": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
     "color_unit":  { "type": ["string", "null"], "enum": ["lovibond", "srm", "ebc", null] },
     "color_value": { "type": ["number", "null"], "minimum": 0 }
   }

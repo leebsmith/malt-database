@@ -15,3 +15,4 @@ crisp	https://crispmalt.com/malts-sitemap.xml	sitemap	html
 brewtarget	https://raw.githubusercontent.com/Brewtarget/brewtarget/main/data/default_db.sqlite	dataset	sqlite
 williams	https://www.williamsbrewing.com/Home-Brewing-Supplies/Malted-Grain-Sugar/Candi-Syrups	listing	html
 northern-brewer	https://www.northernbrewer.com/collections/belgian-candi-sugar/products.json?limit=250	dataset	json
+weyermann	https://www.weyermann.de/en-gb/wp-sitemap-posts-portfolio-1.xml	sitemap	pdf

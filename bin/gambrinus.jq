@@ -56,6 +56,7 @@ def specs:
       description:  (if $short != "" then $short else $long end),
       notes:        (if $short != "" then $long else "" end),
       extract_pct:  ($extract_text | nums[0] | tonum),
+      moisture_pct: ([$specs[] | select((.key // "") | test("Moisture")) | .value][0] // "" | nums[0] | tonum),
       color_unit:   $unit,
       color_min:    ($color_text | nums[0] | tonum),
       color_max:    ($color_text | nums[-1] | tonum)

@@ -14,6 +14,7 @@
     "notes":          { "type": "string" },
     "color_srm":      { "type": ["number", "null"] },
     "yield_on_grind": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
-    "fermentability": { "type": ["number", "null"], "minimum": 0, "maximum": 100 }
+    "fermentability": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+    "moisture_pct":   { "type": ["number", "null"], "minimum": 0, "maximum": 100 }
   }
 }

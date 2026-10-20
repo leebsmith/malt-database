@@ -55,6 +55,7 @@ def malt_type:
       description: ($root | description),
       notes:       (fval($f; "^Flavour")),
       extract_pct: (fval($f; "^Extract") | norm | nums[0] | tonum),
+      moisture_pct: (fval($f; "^Moisture") | norm | nums[0] | tonum),
       color_unit:  $unit,
       color_value: ($color_text | norm | nums[0] | tonum)
     })

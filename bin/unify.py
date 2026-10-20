@@ -91,6 +91,8 @@ def main():
                 malt["notes"] = html.unescape(entry["notes"])
             if color is not None:
                 malt["color_lovibond"] = color
+            if entry.get("moisture_pct") is not None:
+                malt["moisture"] = entry["moisture_pct"]
             if yield_fraction is not None:
                 malt["yield_fraction"] = yield_fraction
                 if basis is not None:

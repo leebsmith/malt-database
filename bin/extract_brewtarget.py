@@ -35,7 +35,7 @@ def main() -> int:
     con.row_factory = sqlite3.Row
     rows = con.execute(
         """
-        select name, fine_grind_yield_pct, color
+        select name, fine_grind_yield_pct, color, moisture
         from fermentable
         where ftype = 'sugar'
         order by name
@@ -66,6 +66,7 @@ def main() -> int:
                 "maltster": "Brewtarget",
                 "product_type": ptype,
                 "extract_pct": row["fine_grind_yield_pct"],
+                "moisture_pct": row["moisture"],
                 "color_unit": "srm" if row["color"] is not None else None,
                 "color_min": row["color"],
                 "color_max": row["color"],

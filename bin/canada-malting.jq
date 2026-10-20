@@ -52,6 +52,7 @@ def rval($rows; $re):
       category_hint: ($root | type_text | trim),
       description:   ($root | description),
       extract_pct:   (rval($r; "^Extract") | norm | nums[0] | tonum),
+      moisture_pct:  (rval($r; "Moisture") | norm | nums[0] | tonum),
       color_unit:    $unit,
       color_min:     ($color_text | norm | nums[0] | tonum),
       color_max:     ($color_text | norm | nums[-1] | tonum)

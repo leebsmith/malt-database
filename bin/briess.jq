@@ -39,5 +39,6 @@ def box_value($label_re):
   notes:          (tag_text("b") | trim),
   color_srm:      (box_value("SRM") | as_pct),
   yield_on_grind: (box_value("Yield") | as_pct),
-  fermentability: (box_value("Fermentability") | as_pct)
+  fermentability: (box_value("Fermentability") | as_pct),
+  moisture_pct:   (box_value("Moisture") | as_pct)
 }]

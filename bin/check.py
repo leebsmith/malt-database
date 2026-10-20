@@ -122,6 +122,15 @@ def main(argv: list[str]) -> int:
                 f"completeness: {field} {frac * 100:.1f}% < {floor * 100:.0f}%"
             )
 
+    # Moisture is reported for information only (many sources omit it; syrups/
+    # sugars often have none), so there is deliberately no completeness floor.
+    moisture_have = sum(1 for m in core if m.get("moisture") is not None)
+    mfrac = moisture_have / n if n else 0.0
+    print(
+        f"  malt moisture      {moisture_have:4}/{n}  {mfrac * 100:5.1f}%  "
+        f"(informational)"
+    )
+
     if errors:
         for err in errors:
             print(f"FAIL: {err}", file=sys.stderr)

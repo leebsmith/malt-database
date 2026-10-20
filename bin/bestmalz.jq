@@ -52,6 +52,7 @@ def colour_value($c):
       maltster:    "Bestmalz",
       description: ($root | description),
       extract_pct: $extract,
+      moisture_pct: ([$rows[] | select((.[0] // "") | test("Moisture")) | .[1:] | .[] | select(test("[0-9]"))][0] // "" | norm | nums[0] | tonum),
       color_unit:  (if $cr == [] then null
                     elif (($cr[1] // "") | test("/")) then "lovibond"
                     else "ebc" end),

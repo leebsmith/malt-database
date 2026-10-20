@@ -1,4 +1,4 @@
-MALSTERS := briess bairds simpsons fawcett gambrinus great-western bestmalz dingemans canada-malting crisp brewtarget williams northern-brewer
+MALSTERS := briess bairds simpsons fawcett gambrinus great-western bestmalz dingemans canada-malting crisp brewtarget williams northern-brewer weyermann
 
 DB := data/db/malts.json
 
@@ -34,6 +34,8 @@ brewtarget: data/maltsters/brewtarget.json
 williams: data/maltsters/williams.json
 
 northern-brewer: data/maltsters/northern-brewer.json
+
+weyermann: data/maltsters/weyermann.json
 
 data/source/briess/products.html: bin/fetch-briess.sh bin/fetch.sh
 	bin/fetch-briess.sh
@@ -73,6 +75,9 @@ data/source/williams/candi-syrups.html: bin/fetch-williams.sh bin/fetch.sh
 
 data/source/northern-brewer/products.json: bin/fetch-northern-brewer.sh bin/fetch.sh
 	bin/fetch-northern-brewer.sh
+
+data/source/weyermann/_sitemap.xml: bin/fetch-weyermann.sh bin/fetch.sh
+	bin/fetch-weyermann.sh
 
 data/maltsters/briess.json: data/source/briess/products.html bin/process-briess.sh bin/validate.py bin/briess.jq
 	bin/process-briess.sh
@@ -125,6 +130,10 @@ data/maltsters/williams.json: data/source/williams/candi-syrups.html bin/process
 data/maltsters/northern-brewer.json: data/source/northern-brewer/products.json bin/process-northern-brewer.sh bin/extract_northern_brewer.py bin/validate.py schema/northern-brewer.schema.json
 	bin/process-northern-brewer.sh
 	python3 bin/validate.py northern-brewer
+
+data/maltsters/weyermann.json: data/source/weyermann/_sitemap.xml bin/process-weyermann.sh bin/extract_weyermann.py bin/validate.py schema/weyermann.schema.json
+	bin/process-weyermann.sh
+	python3 bin/validate.py weyermann
 
 $(DB): $(MALSTERS:%=data/maltsters/%.json) bin/unify.py lib/malt.py
 	python3 bin/unify.py

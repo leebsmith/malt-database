@@ -47,6 +47,8 @@ def notes_text:
       description:        ($root | description_text),
       notes:              ($root | notes_text),
       extract_pct:        (([$rows[] | select((.[0] // "") | test("Extract")) | .[1]][0]) | tonum),
+      moisture_pct:       (([$rows[] | select((.[0] // "") | test("Moisture")) | .[1:]][0] // [])
+                            | map(select(length > 0)) | .[0] | tonum),
       color_lovibond_min: (($color[0]) | tonum),
       color_lovibond_max: (($color[-1]) | tonum)
     })

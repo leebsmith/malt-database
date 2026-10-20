@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "weyermann.schema.json",
+  "title": "Weyermann intermediate malt",
+  "description": "Raw, maltster-native fields parsed from a Weyermann product page and its _Specification.pdf.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "slug", "maltster"],
+  "properties": {
+    "name":               { "type": "string", "minLength": 1 },
+    "slug":               { "type": "string", "minLength": 1 },
+    "maltster":           { "type": "string", "const": "Weyermann" },
+    "description":        { "type": "string" },
+    "notes":              { "type": "string" },
+    "extract_pct":        { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+    "moisture_pct":       { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+    "color_lovibond_min": { "type": ["number", "null"], "minimum": 0 },
+    "color_lovibond_max": { "type": ["number", "null"], "minimum": 0 },
+    "color_ebc_min":      { "type": ["number", "null"], "minimum": 0 },
+    "color_ebc_max":      { "type": ["number", "null"], "minimum": 0 }
+  }
+}

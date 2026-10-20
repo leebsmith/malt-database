@@ -38,7 +38,9 @@ the canonical schema, non-empty names, no HTML entities, colour in 0–1000,
 yield in 0–1 with a valid `yield_basis`, a valid `product_type`, `category`
 present for malt/adjunct (and absent for extract/syrup), no duplicate names
 within a maltster, and completeness floors (colour ≥90%, yield ≥80%, description ≥90%,
-notes ≥65%) computed over `product_type == "malt"` entries.
+notes ≥65%) computed over `product_type == "malt"` entries. `moisture` coverage is
+reported for information only (no floor), since syrups/sugars and several
+maltsters omit it.
 
 ## Workflow (Briess example)
 
@@ -188,12 +190,28 @@ Extract comes from PPG (`1.032 PPG` means 32 points → ~69.6%); syrups with no
 stated PPG assume 1.032 PPG, and crystalline/soft sugars use 46 PPG (100%).
 All are uncategorized.
 
+### Weyermann (sitemap + spec PDFs)
+
+`make weyermann` reads the **English** sitemap
+(`en-gb/wp-sitemap-posts-portfolio-1.xml`; the bare `wp-sitemap-…` sitemap is
+the German catalog), fetches each `/en-gb/product/<slug>/` page, and downloads
+each page's `_Specification.pdf` (deduped by URL; the analysis and aroma-wheel
+PDFs are skipped). WooCommerce duplicate slugs are collapsed by product name.
+Hops (no spec PDF), Sour Wort (no colour), and the liquid extracts
+(RME/Sinamar and the Bavarian/Munich-Amber/Vienna-Red LME kits, whose Lovibond
+is >1000) are dropped. Processing parses the spec PDF's
+`Parameter | Minimum | Maximum | Unit` table — `Extract (dry substance)`,
+`Color (Lovibond)` (fallback `Color (EBC)`), and `Moisture content` — and the
+product page's `h2` name, description block (paragraphs before the "Sensory:"
+line) and notes (the "Sensory:" line). 48 malts.
+
 ## Canonical schema
 
 Required fields: `name`, `maltster`, and `category` for malt and adjunct
 products.
 Optional: `yield_fraction` (0..1) with `yield_basis` (`extract` or
-`fermentability`), `color_lovibond`, `notes`, `description`, `sold_out`
+`fermentability`), `color_lovibond`, `moisture` (percent, e.g. 4.5), `notes`,
+`description`, `sold_out`
 (only where the source reports availability), and `product_type`
 (`malt` | `extract` | `adjunct` | `syrup` | `sugar`).
 
@@ -257,6 +275,11 @@ Text fields are HTML-unescaped in `unify.py`.
 - **Northern Brewer** — Belgian candi sugars/syrups: colour from EBC/SRM/
   Lovibond in the description, extract from PPG (`1.032 PPG` = 32 points);
   CSI products excluded; `product_type` is `sugar` or `syrup`; uncategorized.
+- **Weyermann** — colour midpoint from `Color (Lovibond)` (fallback EBC); extract
+  from `Extract (dry substance)`; moisture from `Moisture content`. `carafa` and
+  `melanoidin` map to ROASTED (added to the shared keyword rules), `cara*` to
+  CRYSTAL, `acidulated` to ACIDULATED, `special-w` to CRYSTAL via slug override;
+  smoked/beech/oak fall through to BASE.
 - `yield_basis` is `extract` for all extract/yield-on-grind figures and
   `fermentability` for Briess extracts/adjuncts.
 - `category` assigned by `lib.malt.classify_category()`.
@@ -330,3 +353,10 @@ present in `data/source/`; `make clean` forces a re-fetch.
   (`lib/malt.py`). Non-malt products (extracts, adjuncts, flakes, syrups) do
   not fit the malt category enum and currently fall back to `BASE`; refine in
   `lib/malt.py` as needed.
+- Weyermann spec PDFs come in two formats: `Color (Lovibond)`/`Color (EBC)`
+  (most) and a legacy `Color … Lovibond`/`Color … EBC` (CARARED); both are
+  parsed. The "Barke Pilsner Malt" page links the standard Pilsner spec (no
+  Barke-specific sheet exists), so it shares that spec's figures. Some names
+  carry site quirks ("Rye Malt pale", "Floor-Malted Bohemiam Pilsner Malt",
+  "Wheat Malt dark"). Liquid extracts (RME, Sinamar, and the Bavarian/amber/
+  red LME kits) are dropped (Lovibond >1000, Brix-based extract).

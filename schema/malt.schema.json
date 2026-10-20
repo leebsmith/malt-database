@@ -11,6 +11,7 @@
     "yield_fraction": { "type": "number", "minimum": 0, "maximum": 1 },
     "yield_basis":    { "type": "string", "enum": ["extract", "fermentability"] },
     "color_lovibond": { "type": "number", "minimum": 0 },
+    "moisture":       { "type": "number", "minimum": 0, "maximum": 100 },
     "notes":          { "type": "string" },
     "description":    { "type": "string" },
     "sold_out":       { "type": "boolean" },

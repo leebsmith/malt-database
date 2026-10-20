@@ -21,7 +21,7 @@ CANONICAL_CATEGORIES = ("BASE", "ROASTED", "CRYSTAL", "ACIDULATED")
 # Ordered keyword rules. First match wins. Applied to "slug name" lowercased.
 KEYWORD_RULES = (
     ("ACIDULATED", ("acidulated", "acid malt", "sauermalz")),
-    ("ROASTED", ("black", "roast", "chocolate", "midnight", "blackprinz", "roasted")),
+    ("ROASTED", ("black", "roast", "chocolate", "midnight", "blackprinz", "roasted", "carafa", "melanoidin")),
     ("CRYSTAL", ("caramel", "cara", "crystal", "carapils", "honey malt")),
 )
 
@@ -75,6 +75,9 @@ CATEGORY_MAP = {
         "brown-malt": "ROASTED",
         "dextrin-malt": "CRYSTAL",
         "06-smooth-coffee": "ROASTED",
+    },
+    "weyermann": {
+        "special-w": "CRYSTAL",
     },
 }
 
@@ -358,6 +361,29 @@ def _northern_brewer_yield(entry: dict) -> float | None:
     return round(extract / 100, 4) if extract is not None else None
 
 
+def _weyermann_color(entry: dict) -> float | None:
+    # The spec PDF publishes Lovibond directly; fall back to EBC (converted)
+    # if Lovibond is absent. Range collapsed to a midpoint.
+    vals = [
+        v
+        for v in (entry.get("color_lovibond_min"), entry.get("color_lovibond_max"))
+        if v is not None
+    ]
+    if vals:
+        return round(sum(vals) / len(vals), 2)
+    ebc = [
+        v for v in (entry.get("color_ebc_min"), entry.get("color_ebc_max")) if v is not None
+    ]
+    if ebc:
+        return round(_to_lovibond(sum(ebc) / len(ebc), "ebc"), 2)
+    return None
+
+
+def _weyermann_yield(entry: dict) -> float | None:
+    extract = entry.get("extract_pct")
+    return round(extract / 100, 4) if extract is not None else None
+
+
 _COLOR = {
     "briess": _briess_color,
     "bairds": _bairds_color,
@@ -373,6 +399,7 @@ _COLOR = {
     "williams brewing": _williams_color,
     "northern brewer": _northern_brewer_color,
     "l.d. carlson": _northern_brewer_color,
+    "weyermann": _weyermann_color,
 }
 
 _YIELD = {
@@ -390,6 +417,7 @@ _YIELD = {
     "williams brewing": _williams_yield,
     "northern brewer": _northern_brewer_yield,
     "l.d. carlson": _northern_brewer_yield,
+    "weyermann": _weyermann_yield,
 }
 
 

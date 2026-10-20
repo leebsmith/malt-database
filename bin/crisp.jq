@@ -72,6 +72,7 @@ def sold_out:
       extract_pct: (if $pct_cell != null then ($pct_cell | norm | nums[0] | tonum)
                     elif $ldk_cell != null then (($ldk_cell | norm | nums[0] | tonum) / 3.866)
                     else null end),
+      moisture_pct: ((row_cells($rows; "^Moisture")[1] // "") | norm | nums[0] | tonum),
       color_unit:  (if $lov_cell != null then "lovibond" elif $ebc_cell != null then "ebc" else null end),
       color_min:   (($color_cell // "") | norm | nums[0] | tonum),
       color_max:   (($color_cell // "") | norm | nums[-1] | tonum)

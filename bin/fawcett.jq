@@ -58,6 +58,7 @@ def tab_rows($id):
         elif $extract_ldk_text != "" then (($extract_ldk_text | nums[0] | tonum) / 3.866)
         else null end
       ),
+      moisture_pct:  ([$rows[] | select((.[0] // "") | test("Moisture")) | .[1]][0] // "" | nums[0] | tonum),
       color_unit:    (if $has_asbc then "lovibond"
                       elif ($has_ebc or ($iob | length) > 0) then "ebc"
                       else null end),

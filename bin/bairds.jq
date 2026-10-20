@@ -49,6 +49,7 @@ def tab_value($re):
       description:    (($texts[($texts | index($name)) + 1] // "") | trim),
       notes:          ($root | detail("Flavour profile") | trim),
       extract_pct:    ($root | tab_value("Extract") | nums[0] // null),
+      moisture_pct:   ($root | tab_value("Moisture") | nums[0] // null),
       color_srm_min:  ($color[0] // null),
       color_srm_max:  ($color[-1] // null)
     })

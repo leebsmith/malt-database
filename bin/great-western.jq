@@ -41,6 +41,7 @@ def attrs:
       description: ($root | para_text("description")),
       notes:       ($root | para_text("additional")),
       extract_pct: ($extract_text | nums[0] | tonum),
+      moisture_pct: ([$a[] | select((.key // "") | test("Moisture")) | .value][0] // "" | nums[0] | tonum),
       color_unit:  (if $color_text != "" then "srm" else null end),
       color_min:   ($color_text | nums[0] | tonum),
       color_max:   ($color_text | nums[-1] | tonum)
