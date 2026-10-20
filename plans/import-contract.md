@@ -1,6 +1,7 @@
 # Import contract — a versioned, well-typed seam to the dag-calculator
 
-**Status:** proposed. **Estimate:** ~3–4 h (schema/envelope + null-vs-0 + a
+**Status:** C.1, C.2, C.3 done (committed in both repos). **C.4 deferred** — do it
+on the next rescrape. **Estimate:** ~3–4 h (schema/envelope + null-vs-0 + a
 coordinated change in `dag-calculator`).
 
 ## 1. Goal
@@ -74,10 +75,27 @@ Today:
   schema (or derive `ALLOWED_KEYS` from it).
 - The manifest records the pinned `schema_version`.
 
-### C.4 — Stable `source_id` (optional)
+### C.4 — Stable `source_id` (deferred — TODO on next rescrape)
 
-- Emit `source_id = "<maltster-slug>/<product-slug>"` per entry.
+**TODO (do on the next rescrape):** emit `source_id = "<maltster-slug>/<product-slug>"`
+per entry so the importer's dedupe/crosswalk keys stop churning on renames. Pair
+this with **fetch metadata** (the exact fetched URL + HTTP `ETag`/`Last-Modified`
+per cached page) — see the rescrape-detection note below — so a future re-run can
+cheaply answer "which sources changed".
+
+- Emit `source_id` per entry.
 - Importer may later use it for dedupe/crosswalk stability (no immediate change).
+
+### Rescrape detection (follow-on)
+
+URL-ifying the cached pages alone does **not** tell you which sources need
+re-scraping — a URL lets you fetch again, but not whether the content changed.
+To make re-scraping cheap and targeted, store, alongside each cached page, its
+fetch metadata (the source URL + `ETag`/`Last-Modified`). A conditional re-fetch
+(`If-None-Match` / `If-Modified-Since`) then returns `304 Not Modified` for
+unchanged pages, so only the pages that actually changed (the `200`s) need
+re-processing — and the per-entry `source_id` maps those pages back to the
+entries whose crosswalk/reps must be re-checked.
 
 ## 5. Notes / open points
 
