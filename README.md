@@ -3,6 +3,22 @@
 A local web scraper/processor that caches maltster assets (HTML/PDF) and unifies
 them into a common JSON object. All scripts run locally; no cloud deployment.
 
+## Prerequisites
+
+- `make`, `curl`, `jq`, `pup` (https://github.com/ericchiang/pup)
+- `pdftotext` (from `poppler-utils`; used to parse the Weyermann spec PDFs)
+- `python3` with `jsonschema` (`pip install jsonschema`)
+
+## Quick start
+
+To consume the finished database, just use the git-tracked release copy
+`dist/malts.json` — no scraper required. To rebuild it from scratch:
+
+```
+make source   # download + cache all sources (network; see "Crawling etiquette")
+make db       # unify into data/db/malts.json and run the quality gate
+```
+
 ## Layout
 
 ```
@@ -362,3 +378,12 @@ present in `data/source/`; `make clean` forces a re-fetch.
   carry site quirks ("Rye Malt pale", "Floor-Malted Bohemiam Pilsner Malt",
   "Wheat Malt dark"). Liquid extracts (RME, Sinamar, and the Bavarian/amber/
   red LME kits) are dropped (Lovibond >1000, Brix-based extract).
+
+## License
+
+The tooling in this repository is MIT-licensed — see [LICENSE](LICENSE).
+
+The ingredient data is sourced from third parties: the Brewtarget default
+database (sugars) is GPLv3; all other malt data is scraped from the respective
+maltster/retailer websites and belongs to those vendors. See the per-maltster
+sections above for attribution.
