@@ -31,6 +31,8 @@ THRESHOLDS = {
     "notes": 0.65,
 }
 
+PROVENANCE_KEYS = ("bound", "kind", "vendor", "url", "retrieved_at", "sha256")
+
 
 def norm_name(name: str) -> str:
     name = name.replace("\u00ae", "").replace("\u2122", "")
@@ -56,6 +58,7 @@ def main(argv: list[str]) -> int:
 
     errors: list[str] = []
     seen: dict[tuple[str, str], list[str]] = defaultdict(list)
+    seen_ids: dict[str, list[str]] = defaultdict(list)
 
     for i, m in enumerate(entries):
         label = f"[{i}] {m.get('maltster', '?')} / {m.get('name', '?')}"
@@ -106,7 +109,48 @@ def main(argv: list[str]) -> int:
         elif basis is not None:
             errors.append(f"{label}: yield_basis without yield_fraction")
 
+        f = m.get("fermentability_fraction")
+        if f is not None and (
+            not isinstance(f, (int, float)) or not (0 <= f <= 1)
+        ):
+            errors.append(f"{label}: fermentability out of range: {f!r}")
+
+        f_prov = m.get("fermentability_provenance")
+        if (f is None) != (f_prov is None):
+            errors.append(
+                f"{label}: fermentability_fraction and fermentability_provenance "
+                "must appear together"
+            )
+        if f_prov is not None:
+            for key in PROVENANCE_KEYS:
+                if not f_prov.get(key):
+                    errors.append(f"{label}: fermentability_provenance missing {key}")
+
+        y_prov = m.get("yield_provenance")
+        if y_prov is not None:
+            if y is None:
+                errors.append(f"{label}: yield_provenance without yield_fraction")
+            for key in PROVENANCE_KEYS:
+                if not y_prov.get(key):
+                    errors.append(f"{label}: yield_provenance missing {key}")
+
+        # A fermentability basis already denotes what the number means; keeping
+        # it in yield_fraction stores the published figure exactly once.
+        if basis == "fermentability" and f is not None:
+            errors.append(
+                f"{label}: yield_basis 'fermentability' already carries the figure; "
+                "do not also set fermentability_fraction"
+            )
+
+        source_id = m.get("source_id")
+        if source_id is not None:
+            seen_ids[source_id].append(label)
+
         seen[(m.get("maltster", ""), norm_name(name))].append(name)
+
+    for source_id, labels in seen_ids.items():
+        if len(labels) > 1:
+            errors.append(f"duplicate source_id {source_id!r}: {labels}")
 
     for (maltster, _key), names in seen.items():
         if len(names) > 1:
@@ -138,6 +182,23 @@ def main(argv: list[str]) -> int:
         f"  malt moisture      {moisture_have:4}/{n}  {mfrac * 100:5.1f}%  "
         f"(informational)"
     )
+
+    # Fermentability is sparsely published, so it is reported, never floored.
+    f_entries = [m for m in entries if m.get("fermentability_fraction") is not None]
+    f_by_maltster = Counter(m.get("maltster", "?") for m in f_entries)
+    print(
+        f"  fermentability     {len(f_entries):4}/{len(entries)}  "
+        f"captured by maltster {dict(f_by_maltster)}"
+    )
+    basis_rows = [m for m in entries if m.get("yield_basis") == "fermentability"]
+    print(
+        f"  fermentability     {len(basis_rows):4} rows carry a fermentability-basis "
+        "yield (importer reinterprets)"
+    )
+    yield_prov = sum(1 for m in entries if m.get("yield_provenance"))
+    print(f"  yield provenance   {yield_prov:4}/{len(entries)}")
+    source_ids = sum(1 for m in entries if m.get("source_id"))
+    print(f"  source_id          {source_ids:4}/{len(entries)}")
 
     if errors:
         for err in errors:

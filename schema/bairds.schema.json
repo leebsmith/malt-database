@@ -15,6 +15,9 @@
     "extract_pct":   { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
     "moisture_pct":  { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
     "color_srm_min": { "type": ["number", "null"], "minimum": 0 },
-    "color_srm_max": { "type": ["number", "null"], "minimum": 0 }
+    "color_srm_max": { "type": ["number", "null"], "minimum": 0 },
+    "source_url":         { "type": "string", "minLength": 1 },
+    "fermentability_pct":   { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+    "fermentability_bound": { "type": ["string", "null"], "enum": ["point", "min", "max", null] }
   }
 }
