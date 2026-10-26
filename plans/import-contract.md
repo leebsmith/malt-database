@@ -1,7 +1,7 @@
 # Import contract — a versioned, well-typed seam to the dag-calculator
 
-**Status:** C.1, C.2, C.3 done (committed in both repos). **C.4 in progress** —
-the rescrape is a rerun from the local page cache. **Estimate:** ~3–4 h
+**Status:** C.1, C.2, C.3, **C.4 done** (`malt_database` `afe1d4f`; consumer
+side lands in the next `dag-calculator` pass). **Estimate:** ~3–4 h
 (schema/envelope + null-vs-0 + a coordinated change in `dag-calculator`).
 
 ## 1. Goal
@@ -75,11 +75,21 @@ Today:
   schema (or derive `ALLOWED_KEYS` from it).
 - The manifest records the pinned `schema_version`.
 
-### C.4 — `source_id` and in-row provenance (in progress)
+### C.4 — `source_id` and in-row provenance (done)
 
-**Status:** extraction rerun from the local page cache (no live fetch). The
-cache is `data/source/` (462 HTML + 59 PDFs), untracked; provenance hashes are
-the link back to it.
+**Status:** done in `afe1d4f`, extracted from the local page cache (no live
+fetch). The cache is `data/source/` (462 HTML + 59 PDFs), untracked; provenance
+hashes are the link back to it. Coverage on the current database: 467/467
+`source_id`, 400/467 yield citations, 22 captured fermentability values
+(Bairds 4 min, Dingemans 15 min, Crisp 2 point, Simpsons 1 point; the 18 Briess
+basis rows stay in `yield_fraction`). Weyermann and the remaining sources
+publish no fermentability.
+
+**Extraction gaps.** Dingemans' "Final attenuation" field repeats the NDMA
+limit on 19 products, so only percent-bearing values are accepted (15 rows
+survive). Simpsons' figure is "un-boiled" and carries that caveat in the
+citation. Crisp's peated pot-still page publishes F without a parseable
+extract. Yield bounds are `unknown` in this pass; Pass 2 parses the qualifier.
 
 Every published figure gets a stable identity and a citation:
 

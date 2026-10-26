@@ -246,6 +246,49 @@ Consumers that use `category` directly should filter on `product_type`.
 
 `category` is one of `BASE`, `ROASTED`, `CRYSTAL`, `ACIDULATED`.
 
+### Fermentability and provenance (C.4)
+
+Every entry carries `source_id` (`<source>/<product-slug>`, e.g.
+`bairds/distilling-malt`) and `source_url`, the cached document it was built
+from. Every published figure carries its own citation:
+
+```json
+"fermentability_fraction": 0.87,
+"fermentability_provenance": {
+  "bound": "min",
+  "kind": "vendor",
+  "vendor": "Bairds",
+  "url": "https://www.bairds-malt.co.uk/distilling-malts/distilling-malt/",
+  "retrieved_at": "2026-10-19T16:18:20Z",
+  "sha256": "…"
+}
+```
+
+`yield_fraction` gets `yield_provenance` the same way (400 of 467 entries; the
+rest publish no extract). `bound` is `point`, `min`, `max`, or `unknown`;
+yields use `unknown` until the extract qualifier is parsed, and consumers treat
+it as a point estimate. `fermentability_fraction` is `null` when the source is
+silent — the export never imputes — and the consumer resolves category priors
+downstream, stamped with provenance kind `prior`.
+
+Fermentability is captured for the four publishers that print a fermentability
+figure, plus the Briess extracts that publish it instead of an extract:
+
+| Source | Entries | Value | Bound |
+|---|---|---|---|
+| Bairds | 4 | 86.5–87.0 % | min |
+| Dingemans | 15 | 80.0 % | min |
+| Crisp | 2 | 87.2 % | point |
+| Simpsons | 1 | 87 % | point (un-boiled, noted) |
+| Briess | 18 | 70–76 % | point, **stored in `yield_fraction`** with `yield_basis: fermentability`; the importer reinterprets it |
+
+Weyermann (spec PDFs carry extract/moisture/colour only) and the remaining
+sources publish no fermentability, so those entries stay `null`.
+
+`provenance` citations hash the cached document (`data/source/`, untracked) and
+record its mtime as `retrieved_at`; HTTP validators (`ETag`/`Last-Modified`)
+are added on the next live fetch so re-scrapes can be conditional.
+
 ## Normalization (intermediate -> canonical)
 
 Per-maltster normalization lives in `lib/malt.py` and is dispatched by
@@ -378,6 +421,21 @@ present in `data/source/`; `make clean` forces a re-fetch.
   carry site quirks ("Rye Malt pale", "Floor-Malted Bohemiam Pilsner Malt",
   "Wheat Malt dark"). Liquid extracts (RME, Sinamar, and the Bavarian/amber/
   red LME kits) are dropped (Lovibond >1000, Brix-based extract).
+- **Dingemans' "Final attenuation" field is corrupted on 19 products**: it
+  repeats the nitrosamine limit (`max 2.5 ppb (**)`). The extractor accepts
+  only a percent-bearing value, so those entries carry no fermentability rather
+  than a 2.5 % figure. The 15 clean pages all report `min. 80.0 %`.
+- **Simpsons publishes "Fermentability % (un-boiled)"**, a distilling metric,
+  not the Congress-mash limit. It is captured with
+  `note: "published as un-boiled fermentability"` so the consumer can treat it
+  as a caveat. Its table lost the `#asbc` id on the distilling page, so the row
+  is read from any table.
+- **Crisp's peated pot-still page publishes fermentability but no parseable
+  extract**, so that entry has `fermentability_fraction` and no
+  `yield_fraction`.
+- No source publishes fermentability for every product; ~5 % of entries carry
+  one. `yield_provenance.bound` is `unknown` for now because the extract
+  qualifier ("min"/"max") is not parsed yet.
 
 ## License
 
