@@ -36,6 +36,14 @@ def description:
    | select(length > 0)]
   | join("\n\n");
 
+def percent_num($text): if $text == null then null elif ($text | test("[0-9]+(?:\\.[0-9]+)?\\s*%")) then ($text | norm | nums[0] | tonum) else null end;
+def bound_of($text):
+  if $text == null then null
+  elif ($text | test("[0-9]+(?:\\.[0-9]+)?\\s*%") | not) then null
+  elif ($text | test("[Mm]in")) then "min"
+  elif ($text | test("[Mm]ax")) then "max"
+  else "point" end;
+
 def malt_type:
   [.. | objects | select((.class // "") | test("group-type"))
    | .. | objects | select(.tag == "a") | .text][0] // "";
@@ -45,6 +53,7 @@ def malt_type:
   | ($root | fields) as $f
   | (fval($f; "^Lovibond")) as $lov_text
   | (fval($f; "^Colour EBC")) as $ebc_text
+  | (fval($f; "^Final attenuation")) as $ferm
   | (if $lov_text != "" then "lovibond" elif $ebc_text != "" then "ebc" else null end) as $unit
   | (if $unit == "lovibond" then $lov_text else $ebc_text end) as $color_text
   | {
@@ -57,5 +66,7 @@ def malt_type:
       extract_pct: (fval($f; "^Extract") | norm | nums[0] | tonum),
       moisture_pct: (fval($f; "^Moisture") | norm | nums[0] | tonum),
       color_unit:  $unit,
-      color_value: ($color_text | norm | nums[0] | tonum)
+      color_value: ($color_text | norm | nums[0] | tonum),
+      fermentability_pct:   percent_num($ferm),
+      fermentability_bound: bound_of($ferm)
     })

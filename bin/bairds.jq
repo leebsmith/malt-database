@@ -38,10 +38,27 @@ def tab_value($re):
     | select(any(.children[]?; .tag == "strong" and ((.text // "") | test($re))))
     | .text][0] // "";
 
+# Value text of the first <p> anywhere whose <strong> matches the regex.
+# (Fermentability sits outside the ASBC tab; anchor the label so the separate
+# "Fermentable Extract" row cannot match.)
+def strong_value($re):
+  [.. | objects | select(.tag == "p")
+    | select(any(.children[]?; .tag == "strong" and ((.text // "") | test($re))))
+    | .text][0] // "";
+
+def percent_num($text): if $text == null then null elif ($text | test("[0-9]+(?:\\.[0-9]+)?\\s*%")) then ($text | nums[0]) else null end;
+def bound_of($text):
+  if $text == null then null
+  elif ($text | test("[0-9]+(?:\\.[0-9]+)?\\s*%") | not) then null
+  elif ($text | test("[Mm]in")) then "min"
+  elif ($text | test("[Mm]ax")) then "max"
+  else "point" end;
+
 (.[0] | . as $root
   | ($root | h1_text) as $name
   | ($root | text_inner_texts) as $texts
   | ($root | tab_value("Colour") | nums) as $color
+  | ($root | strong_value("^Fermentability")) as $ferm
   | {
       name:           ($name | trim),
       slug:           $slug,
@@ -51,5 +68,7 @@ def tab_value($re):
       extract_pct:    ($root | tab_value("Extract") | nums[0] // null),
       moisture_pct:   ($root | tab_value("Moisture") | nums[0] // null),
       color_srm_min:  ($color[0] // null),
-      color_srm_max:  ($color[-1] // null)
+      color_srm_max:  ($color[-1] // null),
+      fermentability_pct:   percent_num($ferm),
+      fermentability_bound: bound_of($ferm)
     })

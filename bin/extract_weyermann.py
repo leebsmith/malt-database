@@ -203,6 +203,7 @@ def main() -> int:
                 "name": name,
                 "slug": slug,
                 "maltster": "Weyermann",
+                "source_url": pdf_url,
                 "description": description,
                 "notes": notes,
                 "extract_pct": spec["extract_pct"],

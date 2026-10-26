@@ -27,6 +27,7 @@ from lib.malt import (
     product_type,
     yield_basis,
 )
+from lib.provenance import citation, seal, source_id
 
 MALTSTERS_DIR = ROOT / "data" / "maltsters"
 DB_PATH = ROOT / "data" / "db" / "malts.json"
@@ -34,6 +35,12 @@ DB_PATH = ROOT / "data" / "db" / "malts.json"
 # Contract revision of the emitted envelope (schema/malt.schema.json). Bump on
 # any breaking change to the canonical shape; the importer pins against this.
 SCHEMA_VERSION = 1
+
+# Caveats that must travel with a captured figure when the source's basis is not
+# the app's Congress-mash prior.
+FERMENTABILITY_NOTES = {
+    "simpsons": "published as un-boiled fermentability",
+}
 
 
 def load_schema(path: Path):
@@ -81,9 +88,13 @@ def main():
             basis = yield_basis(entry)
             ptype = entry.get("product_type") or product_type(name, slug)
 
+            doc_url, doc = citation(key, slug, entry.get("source_url"))
+
             malt = {
                 "name": name,
                 "maltster": maltster,
+                "source_id": source_id(key, slug),
+                "source_url": doc_url,
                 "product_type": ptype,
             }
             if ptype not in ("extract", "syrup", "sugar"):
@@ -103,6 +114,23 @@ def main():
                 malt["yield_fraction"] = yield_fraction
                 if basis is not None:
                     malt["yield_basis"] = basis
+                # Pass 1 does not parse the extract qualifier (min/max); the
+                # importer treats an unknown bound as a point estimate.
+                if basis == "fermentability":
+                    malt["yield_provenance"] = seal(
+                        doc, "point", "published as fermentability"
+                    )
+                else:
+                    malt["yield_provenance"] = seal(doc, "unknown")
+
+            fermentability_pct = entry.get("fermentability_pct")
+            if fermentability_pct is not None:
+                malt["fermentability_fraction"] = fermentability_pct / 100.0
+                malt["fermentability_provenance"] = seal(
+                    doc,
+                    entry.get("fermentability_bound") or "point",
+                    FERMENTABILITY_NOTES.get(key),
+                )
             if entry.get("sold_out") is not None:
                 malt["sold_out"] = entry["sold_out"]
 

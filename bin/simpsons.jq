@@ -29,6 +29,13 @@ def asbc_rows:
    | .. | objects | select(.tag == "tr")
    | [.. | objects | .text? // empty | select(length > 0)]];
 
+# Every table row as per-cell text (the distilling pages carry their
+# fermentability row in a table without the #asbc id).
+def all_rows:
+  [.. | objects | select(.tag == "tr")
+   | [.. | objects | select(.tag == "td" or .tag == "th")
+      | ([.. | objects | .text? // empty] | join(" ") | trim)]];
+
 def notes_text:
   [.. | objects | select(.tag == "div" and .class == "links")
    | .children[]? | select(.tag == "p")
@@ -40,6 +47,8 @@ def notes_text:
   | . as $root
   | ($root | asbc_rows) as $rows
   | ([$rows[] | select((.[0] // "") | test("Colour")) | .[1:]][0] // []) as $color
+  | ([all_rows[] | select((.[0] // "") | test("Fermentability"))][0] // []) as $frow
+  | ($frow[1] // null) as $ferm
   | {
       name:               ($root | h1_text | trim),
       slug:               $slug,
@@ -50,5 +59,7 @@ def notes_text:
       moisture_pct:       (([$rows[] | select((.[0] // "") | test("Moisture")) | .[1:]][0] // [])
                             | map(select(length > 0)) | .[0] | tonum),
       color_lovibond_min: (($color[0]) | tonum),
-      color_lovibond_max: (($color[-1]) | tonum)
+      color_lovibond_max: (($color[-1]) | tonum),
+      fermentability_pct:   ($ferm | tonum),
+      fermentability_bound: (if ($ferm | tonum) == null then null else "point" end)
     })

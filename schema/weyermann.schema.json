@@ -10,6 +10,7 @@
     "name":               { "type": "string", "minLength": 1 },
     "slug":               { "type": "string", "minLength": 1 },
     "maltster":           { "type": "string", "const": "Weyermann" },
+    "source_url":         { "type": "string", "minLength": 1 },
     "description":        { "type": "string" },
     "notes":              { "type": "string" },
     "extract_pct":        { "type": ["number", "null"], "minimum": 0, "maximum": 100 },

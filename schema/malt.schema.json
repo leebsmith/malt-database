@@ -41,7 +41,7 @@
       "additionalProperties": false,
       "required": ["bound", "kind", "vendor", "url", "retrieved_at", "sha256"],
       "properties": {
-        "bound":        { "type": "string", "enum": ["point", "min", "max"] },
+        "bound":        { "type": "string", "enum": ["point", "min", "max", "unknown"] },
         "kind":         { "type": "string", "enum": ["vendor"] },
         "vendor":       { "type": "string", "minLength": 1 },
         "url":          { "type": "string", "minLength": 1 },

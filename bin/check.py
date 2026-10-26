@@ -125,14 +125,24 @@ def main(argv: list[str]) -> int:
             for key in PROVENANCE_KEYS:
                 if not f_prov.get(key):
                     errors.append(f"{label}: fermentability_provenance missing {key}")
+            if f_prov.get("bound") == "unknown":
+                errors.append(
+                    f"{label}: fermentability_provenance bound must be point/min/max"
+                )
 
         y_prov = m.get("yield_provenance")
+        if (y is None) != (y_prov is None):
+            errors.append(
+                f"{label}: yield_fraction and yield_provenance must appear together"
+            )
         if y_prov is not None:
-            if y is None:
-                errors.append(f"{label}: yield_provenance without yield_fraction")
             for key in PROVENANCE_KEYS:
                 if not y_prov.get(key):
                     errors.append(f"{label}: yield_provenance missing {key}")
+            if y_prov.get("bound") == "unknown" and m.get("yield_basis") == "fermentability":
+                errors.append(
+                    f"{label}: a fermentability-basis figure is a point, not an unknown bound"
+                )
 
         # A fermentability basis already denotes what the number means; keeping
         # it in yield_fraction stores the published figure exactly once.
@@ -143,8 +153,12 @@ def main(argv: list[str]) -> int:
             )
 
         source_id = m.get("source_id")
-        if source_id is not None:
+        if not source_id:
+            errors.append(f"{label}: missing source_id")
+        else:
             seen_ids[source_id].append(label)
+        if not m.get("source_url"):
+            errors.append(f"{label}: missing source_url")
 
         seen[(m.get("maltster", ""), norm_name(name))].append(name)
 

@@ -46,6 +46,14 @@ def rows:
 def row_cells($rows; $re):
   [$rows[] | select((.[0] // "") | test($re))][0] // [];
 
+def percent_num($text): if $text == null then null elif ($text | test("[0-9]+(?:\\.[0-9]+)?\\s*%")) then ($text | norm | nums[0] | tonum) else null end;
+def bound_of($text):
+  if $text == null then null
+  elif ($text | test("[0-9]+(?:\\.[0-9]+)?\\s*%") | not) then null
+  elif ($text | test("[Mm]in")) then "min"
+  elif ($text | test("[Mm]ax")) then "max"
+  else "point" end;
+
 def sold_out:
   [.. | objects | select(.tag == "img" and ((.class // "") | test("malt-post__title")))
    | (((.alt // "") + " " + (.src // "") + " " + (."data-src" // ""))
@@ -62,6 +70,8 @@ def sold_out:
   | (if $lov_cell != null then $lov_cell elif $ebc_cell != null then $ebc_cell else null end) as $color_cell
   | ([$erow[] | select(test("%"))] | .[-1]) as $pct_cell
   | ([$erow[] | select(test("L°/kg"))] | .[-1]) as $ldk_cell
+  | ([$rows[] | select((.[0] // "") | test("Fermentability"))][0] // []) as $frow
+  | ([$frow[] | select(test("[0-9]+(?:\\.[0-9]+)?\\s*%"))] | .[0]) as $fcell
   | {
       name:        ($root | name_text | trim),
       slug:        $slug,
@@ -75,5 +85,7 @@ def sold_out:
       moisture_pct: ((row_cells($rows; "^Moisture")[1] // "") | norm | nums[0] | tonum),
       color_unit:  (if $lov_cell != null then "lovibond" elif $ebc_cell != null then "ebc" else null end),
       color_min:   (($color_cell // "") | norm | nums[0] | tonum),
-      color_max:   (($color_cell // "") | norm | nums[-1] | tonum)
+      color_max:   (($color_cell // "") | norm | nums[-1] | tonum),
+      fermentability_pct:   percent_num($fcell),
+      fermentability_bound: bound_of(($frow | join(" ")))
     })
